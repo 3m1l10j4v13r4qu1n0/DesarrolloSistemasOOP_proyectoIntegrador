@@ -1,0 +1,142 @@
+@startuml diagramaProyectosTareas
+skinparam classAttributeIconSize 0
+
+' ===== Entidades del Dominio =====
+class Proyecto {
+    -id_proyecto : int
+    -nombre : string
+    -descripcion : string
+    -fecha_inicio : string
+    -fecha_fin : string
+    -estado : string
+    +__init__(nombre, fecha_inicio, fecha_fin, ...)
+    +validar() : void
+    +_es_fecha_valida() : bool
+}
+
+class Miembro {
+    -id_miembro : int
+    -nombre : string
+    -apellido : string
+    -email : string
+    -rol : string
+    -fecha_ingreso : string
+    +__init__(nombre, apellido, email, rol, ...)
+    +validar() : void
+    +nombre_completo : string
+}
+
+class Tarea {
+    -id_tarea : int
+    -titulo : string
+    -descripcion : string
+    -id_proyecto : int
+    -id_miembro_asignado : int
+    -prioridad : string
+    -estado : string
+    -fecha_creacion : string
+    -fecha_vencimiento : string
+    +__init__(titulo, id_proyecto, ...)
+    +validar() : void
+    +asignar_miembro(id_miembro : int) : void
+    +desasignar_miembro() : void
+    +completar() : void
+    +bloquear() : void
+    +esta_vencida() : bool
+    +_es_fecha_valida() : bool
+}
+
+' ===== Interfaces de Repositorio =====
+interface IProyectoRepositorio {
+    +crear(proyecto: Proyecto) : int
+    +obtener_por_id(id: int) : Proyecto
+    +obtener_todos() : List<Proyecto>
+    +actualizar(proyecto: Proyecto) : void
+    +eliminar(id: int) : void
+    +buscar_por_estado(estado: string) : List<Proyecto>
+}
+
+interface IMiembroRepositorio {
+    +crear(miembro: Miembro) : int
+    +obtener_por_id(id: int) : Miembro
+    +obtener_todos() : List<Miembro>
+    +actualizar(miembro: Miembro) : void
+    +eliminar(id: int) : void
+    +buscar_por_rol(rol: string) : List<Miembro>
+}
+
+interface ITareaRepositorio {
+    +crear(tarea: Tarea) : int
+    +obtener_por_id(id: int) : Tarea
+    +obtener_todas() : List<Tarea>
+    +actualizar(tarea: Tarea) : void
+    +eliminar(id: int) : void
+    +obtener_por_proyecto(id_proyecto: int) : List<Tarea>
+    +obtener_por_miembro(id_miembro: int) : List<Tarea>
+    +obtener_por_estado(estado: string) : List<Tarea>
+}
+
+' ===== Servicio de Lógica de Negocio =====
+class ServicioTareas {
+    -tarea_repo : ITareaRepositorio
+    -proyecto_repo : IProyectoRepositorio
+    -miembro_repo : IMiembroRepositorio
+    +__init__(tarea_repo, proyecto_repo, miembro_repo)
+    +crear_tarea(tarea: Tarea) : int
+    +asignar_tarea(id_tarea: int, id_miembro: int) : void
+    +cambiar_estado_tarea(id_tarea: int, nuevo_estado: string) : void
+    +obtener_tareas_por_proyecto(id_proyecto: int) : List<Tarea>
+    +obtener_tareas_por_miembro(id_miembro: int) : List<Tarea>
+    +obtener_tareas_pendientes() : List<Tarea>
+}
+
+' ===== Excepciones =====
+class DatoInvalidoError <<exception>> {
+    +mensaje : string
+    +__init__(mensaje: string)
+}
+
+class AsignacionInvalidaError <<exception>> {
+    +mensaje : string
+    +__init__(mensaje: string)
+}
+
+class NoEncontradoError <<exception>> {
+    +entidad : string
+    +identificador : any
+    +mensaje : string
+    +__init__(entidad: string, identificador: any)
+}
+
+class ProyectoInactivoError <<exception>> {
+    +id_proyecto : int
+    +estado_actual : string
+    +__init__(id_proyecto: int, estado_actual: string)
+}
+
+' ===== Relaciones =====
+Proyecto "1" *-- "0..*" Tarea : contiene
+Proyecto "0..*" o-- "0..*" Miembro : asignado a
+Miembro "0..1" -- "0..*" Tarea : asignado a
+
+IProyectoRepositorio ..> Proyecto : gestiona
+IMiembroRepositorio ..> Miembro : gestiona
+ITareaRepositorio ..> Tarea : gestiona
+
+ServicioTareas --> ITareaRepositorio : usa
+ServicioTareas --> IProyectoRepositorio : usa
+ServicioTareas --> IMiembroRepositorio : usa
+ServicioTareas ..> Tarea : crea/modifica
+ServicioTareas ..> Proyecto : consulta
+ServicioTareas ..> Miembro : consulta
+
+Proyecto ..> DatoInvalidoError : lanza
+Miembro ..> DatoInvalidoError : lanza
+Tarea ..> DatoInvalidoError : lanza
+Tarea ..> AsignacionInvalidaError : lanza
+
+ServicioTareas ..> NoEncontradoError : lanza
+ServicioTareas ..> ProyectoInactivoError : lanza
+ServicioTareas ..> AsignacionInvalidaError : lanza
+
+@enduml

@@ -1,0 +1,95 @@
+@startuml Crear y asignar tarea
+actor Usuario
+participant "Interfaz Usuario" as UI
+participant "ServicioTareas" as Servicio
+participant "ITareaRepositorio" as TareaRepo
+participant "IProyectoRepositorio" as ProyRepo
+participant "IMiembroRepositorio" as MiemRepo
+participant "Tarea" as TareaObj
+database "Base de Datos" as DB
+
+== Flujo Principal: Crear y Asignar Tarea Exitosamente ==
+
+Usuario ->> UI: Completar formulario (titulo, id_proyecto, id_miembro)
+UI ->> UI: Validar campos HTML5
+UI ->> Servicio: crear_tarea(tarea)
+
+Servicio ->> TareaObj: __init__(titulo, id_proyecto, ...)
+activate TareaObj
+TareaObj -->> Servicio: tarea creada
+deactivate TareaObj
+
+Servicio ->> TareaObj: validar()
+activate TareaObj
+TareaObj ->> TareaObj: Validar datos de tarea
+TareaObj -->> Servicio: OK
+deactivate TareaObj
+
+Servicio ->> ProyRepo: obtener_por_id(id_proyecto)
+activate ProyRepo
+ProyRepo ->> DB: SELECT * FROM proyectos WHERE id=?
+DB -->> ProyRepo: resultado
+ProyRepo -->> Servicio: proyecto
+deactivate ProyRepo
+
+alt Proyecto no existe
+    Servicio -->> UI: NoEncontradoError("Proyecto", id)
+    UI -->> Usuario: Mostrar error "Proyecto no encontrado"
+else Proyecto inactivo
+    Servicio -->> UI: ProyectoInactivoError(id, estado)
+    UI -->> Usuario: Mostrar error "Proyecto no está activo"
+else Proyecto válido
+    Servicio ->> TareaRepo: crear(tarea)
+    activate TareaRepo
+    TareaRepo ->> DB: INSERT INTO tareas (...)
+    DB -->> TareaRepo: id_tarea generado
+    TareaRepo -->> Servicio: id_tarea
+    deactivate TareaRepo
+
+    alt Asignar a miembro
+        Servicio ->> Servicio: asignar_tarea(id_tarea, id_miembro)
+        Servicio ->> MiemRepo: obtener_por_id(id_miembro)
+        activate MiemRepo
+        MiemRepo ->> DB: SELECT * FROM miembros WHERE id=?
+        DB -->> MiemRepo: resultado
+        MiemRepo -->> Servicio: miembro
+        deactivate MiemRepo
+
+        alt Miembro no existe
+            Servicio ->> UI: NoEncontradoError("Miembro", id)
+            UI -->> Usuario: Mostrar error "Miembro no encontrado"
+        else Miembro válido
+            Servicio ->> TareaObj: asignar_miembro(id_miembro)
+            activate TareaObj
+            TareaObj ->> TareaObj: Cambiar estado a "en_progreso"
+            TareaObj -->> Servicio: OK
+            deactivate TareaObj
+
+            Servicio ->> TareaRepo: actualizar(tarea)
+            activate TareaRepo
+            TareaRepo ->> DB: UPDATE tareas SET id_miembro=?, estado=?
+            DB -->> TareaRepo: OK
+            TareaRepo -->> Servicio: OK
+            deactivate TareaRepo
+
+            Servicio -->> UI: Tarea creada y asignada exitosamente
+            UI -->> Usuario: Mostrar mensaje "Tarea creada correctamente"
+        end
+    else Sin asignación
+        Servicio -->> UI: Tarea creada exitosamente
+        UI -->> Usuario: Mostrar mensaje de éxito
+    end
+end
+
+== Trayectoria de Error: Validación de Datos ==
+Usuario ->> UI: Completar formulario con datos inválidos
+UI ->> Servicio: crear_tarea(tarea)
+Servicio ->> TareaObj: __init__(titulo = "")
+Servicio ->> TareaObj: validar()
+activate TareaObj
+TareaObj ->> Servicio: DatoInvalidoError("Título obligatorio")
+deactivate TareaObj
+Servicio -->> UI: DatoInvalidoError
+UI -->> Usuario: Mostrar error de validación
+
+@enduml
