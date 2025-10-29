@@ -1,0 +1,106 @@
+# Entorno virtual
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Variables de entorno y configuración sensible
+.env
+.env.local
+.env.*.local
+*.env
+config_local.py
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Base de datos
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.code-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Flask
+instance/
+.webassets-cache
+
+# Migraciones locales (si usas Alembic)
+# migrations/versions/*.py  # Descomenta si no quieres versionar migraciones
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+.cache/
+tmp/
+
+# Sistema operativo
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Documentación generada
+docs/_build/
+site/
+
+# Uploads de usuarios (si aplica)
+uploads/
+media/
+
+# Certificados y claves
+*.pem
+*.key
+*.crt
+*.cert
