@@ -18,10 +18,18 @@ Sistema CRUD para gestionar proyectos, miembros del equipo y tareas, implementan
 ```
 proyecto-tareas/
 │
-├── domain/
-│   ├── proyecto.py          # Entidad Proyecto
-│   ├── miembro.py           # Entidad Miembro
-│   └── tarea.py             # Entidad Tarea
+├── app
+│   │
+│   ├── business
+│   │
+│   ├── domain/
+│   │   ├── proyecto.py          # Entidad Proyecto
+│   │   ├── miembro.py           # Entidad Miembro
+│   │   └── tarea.py             # Entidad Tarea
+│   │   
+│   ├── 
+│   ├── 
+│   └── 
 │
 ├── exceptions/
 │   └── proyecto_exceptions.py   # Excepciones personalizadas
@@ -31,7 +39,7 @@ proyecto-tareas/
 │
 ├── diagramas/
 │   ├── diagrama_clases.png  # Diagrama de clases UML
-│    ├── diagrama_clases.puml  # codigo plantUML Diagrama de clases UML
+│   ├── diagrama_clases.puml  # codigo plantUML Diagrama de clases UML
 │   └── diagrama_secuencia.png  # Diagrama de secuencia con error
 │   └── diagrama_secuencia.puml  # codigo plantUML Diagrama de secuencia con error
 │
