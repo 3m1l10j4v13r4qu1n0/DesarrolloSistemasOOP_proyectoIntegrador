@@ -2,8 +2,7 @@
 Entidad Mienbro - Domain Layer
 Sistema de Gestión de Proyectos y Tareas
 """
-
-from exceptions.proyecto_exceptions import DatoInvalidoError
+from app.exceptions.proyecto_exceptions import DatoInvalidoError
 
 class Miembro:
     def __init__(self, nombre: str, apellido: str, email: str, rol: str, fecha_ingreso: str, id_miembro: int = None):

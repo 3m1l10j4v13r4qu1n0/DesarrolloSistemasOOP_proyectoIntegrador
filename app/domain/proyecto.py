@@ -3,7 +3,7 @@ Entidad Proyecto - Domain Layer
 Sistema de Gestión de Proyectos y Tareas
 """
 from datetime import date
-from exceptions.proyecto_exceptions import DatoInvalidoError
+from app.exceptions.proyecto_exceptions import DatoInvalidoError
 
 
 class Proyecto:

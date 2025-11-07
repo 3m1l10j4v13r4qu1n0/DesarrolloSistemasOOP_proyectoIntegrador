@@ -3,12 +3,12 @@ Modelo Proyecto - Infrastructure Layer
 Solo se encarga de mapear a la base de datos (sin validaciones de negocio)
 """
 from sqlalchemy import Column, Integer, String, Date
-from database import Base
-from domain.proyecto import Proyecto
+from app import db
+from app.domain.proyecto import Proyecto
 from datetime import date
 
 
-class ProyectoModel(Base):
+class ProyectoModel(db.Model):
     """Modelo de persistencia - Mapeo a la base de datos"""
     
     __tablename__ = 'proyectos'

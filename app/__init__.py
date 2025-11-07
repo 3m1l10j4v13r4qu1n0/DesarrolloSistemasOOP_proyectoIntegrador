@@ -3,8 +3,7 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from config import Config
-
+from .config import Config
 db = SQLAlchemy()
 
 
@@ -17,11 +16,12 @@ def create_app(config_class=Config):
     app = Flask(__name__,template_folder=template_dir,
                 static_folder=static_dir)
     
-    app.config.from_object(config_class)
+    app.config.from_object(config_class) 
 
     db.init_app(app)
 
     with app.app_context():
+       
         #Importo modelos
         from app.data.models.proyecto_model import ProyectoModel
         #Importo rutas 
