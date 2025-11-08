@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block title %}Proyectos{% endblock %}
+
+
+{% block content %}
+<div>
+    <h2 style="color: #667eea; margin-bottom: 20px;">Lista de Productos</h2>
+    
+    {% include('partials/_header.html') %}
+
+    <a href="#" class="btn btn-primary">Crea un nuevo Proyecto</a>
+    
+    {% if products %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.nombre }}</td>
+                <td>{{ product.descripcion[:50] }}{% if product.descripcion|length > 50 %}...{% endif %}</td>
+                <td>${{ "%.2f"|format(product.precio) }}</td>
+                <td>{{ product.stock }}</td>
+                <td>
+                    <a href="#" class="btn btn-primary">Ver</a>
+                    <form method="POST" action="#" style="display: inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este producto?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; color: #666; margin: 40px 0;">No hay proyectos registrados. ¡Crea el primero!</p>
+    {% endif %}
+</div>
+{% endblock %}

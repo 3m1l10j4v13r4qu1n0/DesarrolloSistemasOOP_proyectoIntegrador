@@ -45,8 +45,8 @@ CREATE TABLE tareas (
     CHECK (estado IN ('pendiente', 'en_progreso', 'completada', 'bloqueada'))
 );
 
--- Tabla de relación Miembros-Proyectos (para asignar miembros a proyectos)
-CREATE TABLE miembros_proyectos (
+-- Tabla de relación proyecto_miembro (para asignar miembros a proyectos)
+CREATE TABLE proyecto_miembro (
     id_miembro INTEGER NOT NULL,
     id_proyecto INTEGER NOT NULL,
     fecha_asignacion DATE DEFAULT (DATE('now')),

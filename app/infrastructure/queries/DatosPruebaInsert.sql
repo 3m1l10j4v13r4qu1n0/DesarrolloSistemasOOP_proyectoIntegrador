@@ -26,7 +26,7 @@ INSERT INTO miembros (nombre, apellido, email, rol, fecha_ingreso) VALUES
 ('Laura', 'Torres', 'laura.torres@empresa.com', 'tester', '2024-04-20');
 
 -- Asignar Miembros a Proyectos
-INSERT INTO miembros_proyectos (id_miembro, id_proyecto, fecha_asignacion) VALUES
+INSERT INTO proyecto_miembro (id_miembro, id_proyecto, fecha_asignacion) VALUES
 (1, 1, '2025-01-15'), -- Juan en Sistema de Ventas
 (2, 1, '2025-01-15'), -- María en Sistema de Ventas
 (3, 1, '2025-01-16'), -- Carlos en Sistema de Ventas
