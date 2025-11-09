@@ -1,0 +1,190 @@
+<!-- 
+==================================================
+Formulario para crear tarea
+==================================================
+-->
+{% extends "layout.html" %}
+
+{% block title %}Nueva Tarea{% endblock %}
+
+{% block content %}
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #667eea;">Crear Nueva Tarea</h2>
+        <a href="{{ url_for('tareas.listar') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+    
+    {% include('partials/_header.html') %}
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <i class="bi bi-plus-square"></i> Información de la Tarea
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('tareas.crear') }}">
+                <div class="row">
+                    <!-- Título -->
+                    <div class="col-md-12 mb-3">
+                        <label for="titulo" class="form-label">Título de la Tarea *</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="titulo" 
+                            name="titulo" 
+                            required
+                            maxlength="150"
+                            placeholder="Ingrese el título de la tarea">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Descripción -->
+                    <div class="col-md-12 mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea 
+                            class="form-control" 
+                            id="descripcion" 
+                            name="descripcion" 
+                            rows="4"
+                            maxlength="1000"
+                            placeholder="Describe la tarea, pasos a seguir, requerimientos, etc."></textarea>
+                        <small class="text-muted">Máximo 1000 caracteres</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Proyecto -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_proyecto" class="form-label">Proyecto *</label>
+                        <select class="form-select" id="id_proyecto" name="id_proyecto" required>
+                            <option value="">Seleccione un proyecto</option>
+                            {% for proyecto in proyectos %}
+                            <option value="{{ proyecto.id_proyecto }}" 
+                                    {% if id_proyecto and id_proyecto == proyecto.id_proyecto %}selected{% endif %}>
+                                {{ proyecto.nombre }} ({{ proyecto.estado }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if not proyectos %}
+                        <small class="text-danger">No hay proyectos disponibles. 
+                            <a href="{{ url_for('proyectos.nuevo') }}">Crear proyecto</a>
+                        </small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Asignado a -->
+                    <div class="col-md-6 mb-3">
+                        <label for="id_miembro_asignado" class="form-label">Asignar a</label>
+                        <select class="form-select" id="id_miembro_asignado" name="id_miembro_asignado">
+                            <option value="">Sin asignar</option>
+                            {% for miembro in miembros %}
+                            <option value="{{ miembro.id_miembro }}">
+                                {{ miembro.nombre }} {{ miembro.apellido }} - {{ miembro.rol }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if not miembros %}
+                        <small class="text-warning">No hay miembros disponibles. 
+                            <a href="{{ url_for('miembros.nuevo') }}">Crear miembro</a>
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Prioridad -->
+                    <div class="col-md-6 mb-3">
+                        <label for="prioridad" class="form-label">Prioridad *</label>
+                        <select class="form-select" id="prioridad" name="prioridad" required>
+                            <option value="baja">Baja</option>
+                            <option value="media" selected>Media</option>
+                            <option value="alta">Alta</option>
+                            <option value="urgente">Urgente</option>
+                        </select>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="col-md-6 mb-3">
+                        <label for="estado" class="form-label">Estado *</label>
+                        <select class="form-select" id="estado" name="estado" required>
+                            <option value="pendiente" selected>Pendiente</option>
+                            <option value="en_progreso">En Progreso</option>
+                            <option value="completada">Completada</option>
+                            <option value="cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Fecha de Creación -->
+                    <div class="col-md-6 mb-3">
+                        <label for="fecha_creacion" class="form-label">Fecha de Creación</label>
+                        <input 
+                            type="date" 
+                            class="form-control" 
+                            id="fecha_creacion" 
+                            name="fecha_creacion">
+                        <small class="text-muted">Si se deja vacío, se usará la fecha de hoy</small>
+                    </div>
+
+                    <!-- Fecha de Vencimiento -->
+                    <div class="col-md-6 mb-3">
+                        <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento</label>
+                        <input 
+                            type="date" 
+                            class="form-control" 
+                            id="fecha_vencimiento" 
+                            name="fecha_vencimiento">
+                        <small class="text-muted">Opcional - Fecha límite para completar la tarea</small>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong><i class="bi bi-info-circle"></i> Nota:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Los campos marcados con (*) son obligatorios</li>
+                        <li>Puedes cambiar el estado de la tarea más adelante</li>
+                        <li>Asegúrate de seleccionar el proyecto correcto</li>
+                    </ul>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Guardar Tarea
+                    </button>
+                    <a href="{{ url_for('tareas.listar') }}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Establecer la fecha de hoy como fecha de creación por defecto
+    document.getElementById('fecha_creacion').valueAsDate = new Date();
+    
+    // Validación: Fecha de vencimiento debe ser igual o posterior a fecha de creación
+    document.getElementById('fecha_vencimiento').addEventListener('change', function() {
+        const fechaCreacion = document.getElementById('fecha_creacion').value;
+        const fechaVencimiento = this.value;
+        
+        if (fechaCreacion && fechaVencimiento && fechaVencimiento < fechaCreacion) {
+            alert('La fecha de vencimiento debe ser igual o posterior a la fecha de creación');
+            this.value = '';
+        }
+    });
+    
+    // Filtrar miembros según proyecto seleccionado (opcional, requiere AJAX)
+    document.getElementById('id_proyecto').addEventListener('change', function() {
+        const proyectoId = this.value;
+        // Aquí podrías hacer una llamada AJAX para filtrar solo los miembros de ese proyecto
+        // Por ahora mostramos todos los miembros
+    });
+</script>
+{% endblock %}

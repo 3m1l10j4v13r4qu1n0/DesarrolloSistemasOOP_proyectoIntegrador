@@ -1,0 +1,120 @@
+<!-- 
+==================================================
+Formulario para crear miembro
+==================================================
+-->
+{% extends "layout.html" %}
+
+{% block title %}Nuevo Miembro{% endblock %}
+
+{% block content %}
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #667eea;">Crear Nuevo Miembro</h2>
+        <a href="{{ url_for('miembros.listar') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+    
+    {% include('partials/_header.html') %}
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <i class="bi bi-person-plus"></i> Información del Miembro
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('miembros.crear') }}">
+                <div class="row">
+                    <!-- Nombre -->
+                    <div class="col-md-6 mb-3">
+                        <label for="nombre" class="form-label">Nombre *</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="nombre" 
+                            name="nombre" 
+                            required
+                            maxlength="50"
+                            placeholder="Ingrese el nombre">
+                    </div>
+
+                    <!-- Apellido -->
+                    <div class="col-md-6 mb-3">
+                        <label for="apellido" class="form-label">Apellido *</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="apellido" 
+                            name="apellido" 
+                            required
+                            maxlength="50"
+                            placeholder="Ingrese el apellido">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Email -->
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">Email *</label>
+                        <input 
+                            type="email" 
+                            class="form-control" 
+                            id="email" 
+                            name="email" 
+                            required
+                            maxlength="100"
+                            placeholder="ejemplo@correo.com">
+                        <small class="text-muted">El email debe ser único en el sistema</small>
+                    </div>
+
+                    <!-- Rol -->
+                    <div class="col-md-6 mb-3">
+                        <label for="rol" class="form-label">Rol *</label>
+                        <select class="form-select" id="rol" name="rol" required>
+                            <option value="">Seleccione un rol</option>
+                            <option value="Desarrollador">Desarrollador</option>
+                            <option value="Diseñador">Diseñador</option>
+                            <option value="Project Manager">Project Manager</option>
+                            <option value="QA Tester">QA Tester</option>
+                            <option value="DevOps">DevOps</option>
+                            <option value="Product Owner">Product Owner</option>
+                            <option value="Scrum Master">Scrum Master</option>
+                            <option value="Analista">Analista</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Fecha de Ingreso -->
+                    <div class="col-md-6 mb-3">
+                        <label for="fecha_ingreso" class="form-label">Fecha de Ingreso *</label>
+                        <input 
+                            type="date" 
+                            class="form-control" 
+                            id="fecha_ingreso" 
+                            name="fecha_ingreso" 
+                            required
+                            value="{{ today }}">
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Guardar Miembro
+                    </button>
+                    <a href="{{ url_for('miembros.listar') }}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Establecer la fecha de hoy por defecto
+    document.getElementById('fecha_ingreso').valueAsDate = new Date();
+</script>
+{% endblock %}

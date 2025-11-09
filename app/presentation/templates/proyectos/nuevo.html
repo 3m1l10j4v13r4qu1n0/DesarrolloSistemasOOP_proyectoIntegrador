@@ -1,0 +1,159 @@
+<!-- 
+==================================================
+Formulario para crear proyecto
+==================================================
+-->
+{% extends "layout.html" %}
+
+{% block title %}Nuevo Proyecto{% endblock %}
+
+{% block content %}
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #667eea;">Crear Nuevo Proyecto</h2>
+        <a href="{{ url_for('proyectos.listar') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+    
+    {% include('partials/_header.html') %}
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <i class="bi bi-folder-plus"></i> Información del Proyecto
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('proyectos.crear') }}">
+                <div class="row">
+                    <!-- Nombre -->
+                    <div class="col-md-12 mb-3">
+                        <label for="nombre" class="form-label">Nombre del Proyecto *</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="nombre" 
+                            name="nombre" 
+                            required
+                            maxlength="100"
+                            placeholder="Ingrese el nombre del proyecto">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Descripción -->
+                    <div class="col-md-12 mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea 
+                            class="form-control" 
+                            id="descripcion" 
+                            name="descripcion" 
+                            rows="4"
+                            maxlength="500"
+                            placeholder="Describe el proyecto, objetivos, alcance, etc."></textarea>
+                        <small class="text-muted">Máximo 500 caracteres</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Fecha de Inicio -->
+                    <div class="col-md-4 mb-3">
+                        <label for="fecha_inicio" class="form-label">Fecha de Inicio *</label>
+                        <input 
+                            type="date" 
+                            class="form-control" 
+                            id="fecha_inicio" 
+                            name="fecha_inicio" 
+                            required>
+                    </div>
+
+                    <!-- Fecha de Fin -->
+                    <div class="col-md-4 mb-3">
+                        <label for="fecha_fin" class="form-label">Fecha de Fin *</label>
+                        <input 
+                            type="date" 
+                            class="form-control" 
+                            id="fecha_fin" 
+                            name="fecha_fin" 
+                            required>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="col-md-4 mb-3">
+                        <label for="estado" class="form-label">Estado *</label>
+                        <select class="form-select" id="estado" name="estado" required>
+                            <option value="activo" selected>Activo</option>
+                            <option value="en_pausa">En Pausa</option>
+                            <option value="completado">Completado</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Asignar Miembros -->
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Asignar Miembros al Proyecto</label>
+                        <div class="card">
+                            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                {% if miembros %}
+                                    <div class="row">
+                                        {% for miembro in miembros %}
+                                        <div class="col-md-6 mb-2">
+                                            <div class="form-check">
+                                                <input 
+                                                    class="form-check-input" 
+                                                    type="checkbox" 
+                                                    name="miembros" 
+                                                    value="{{ miembro.id_miembro }}" 
+                                                    id="miembro_{{ miembro.id_miembro }}">
+                                                <label class="form-check-label" for="miembro_{{ miembro.id_miembro }}">
+                                                    <strong>{{ miembro.nombre }} {{ miembro.apellido }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">{{ miembro.rol }} - {{ miembro.email }}</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">No hay miembros registrados. 
+                                        <a href="{{ url_for('miembros.nuevo') }}">Crear un miembro primero</a>
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <small class="text-muted">Puedes gestionar los miembros después de crear el proyecto</small>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Guardar Proyecto
+                    </button>
+                    <a href="{{ url_for('proyectos.listar') }}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Establecer la fecha de hoy como fecha de inicio por defecto
+    document.getElementById('fecha_inicio').valueAsDate = new Date();
+    
+    // Validación: Fecha fin debe ser mayor que fecha inicio
+    document.getElementById('fecha_fin').addEventListener('change', function() {
+        const fechaInicio = document.getElementById('fecha_inicio').value;
+        const fechaFin = this.value;
+        
+        if (fechaInicio && fechaFin && fechaFin < fechaInicio) {
+            alert('La fecha de fin debe ser posterior a la fecha de inicio');
+            this.value = '';
+        }
+    });
+</script>
+{% endblock %}

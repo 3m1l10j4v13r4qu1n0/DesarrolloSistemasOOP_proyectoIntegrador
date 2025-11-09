@@ -12,7 +12,7 @@ def nuevo():
     return render_template('miembros/nuevo.html')
 
 # CREATE - Guardar nuevo miembro
-@miembros_bp.route('/crear', methods=['POST'])
+@miembros_bp.route('/crear',methods=['GET', 'POST'])
 def crear():
     """Crea un nuevo miembro en la base de datos"""
     try:

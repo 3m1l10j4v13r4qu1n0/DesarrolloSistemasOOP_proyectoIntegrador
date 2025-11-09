@@ -1,0 +1,193 @@
+<!-- 
+==================================================
+Formulario para editar proyecto
+==================================================
+-->
+{% extends "layout.html" %}
+
+{% block title %}Editar Proyecto{% endblock %}
+
+{% block content %}
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #667eea;">Editar Proyecto</h2>
+        <div>
+            <a href="{{ url_for('proyectos.detalle', id=proyecto.id_proyecto) }}" class="btn btn-info">
+                <i class="bi bi-eye"></i> Ver Detalle
+            </a>
+            <a href="{{ url_for('proyectos.listar') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+    
+    {% include('partials/_header.html') %}
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <i class="bi bi-pencil-square"></i> Editar Información del Proyecto
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('proyectos.actualizar', id=proyecto.id_proyecto) }}">
+                <div class="row">
+                    <!-- Nombre -->
+                    <div class="col-md-12 mb-3">
+                        <label for="nombre" class="form-label">Nombre del Proyecto *</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="nombre" 
+                            name="nombre" 
+                            required
+                            maxlength="100"
+                            value="{{ proyecto.nombre }}"
+                            placeholder="Ingrese el nombre del proyecto">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Descripción -->
+                    <div class="col-md-12 mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea 
+                            class="form-control" 
+                            id="descripcion" 
+                            name="descripcion" 
+                            rows="4"
+                            maxlength="500"
+                            placeholder="Describe el proyecto, objetivos, alcance, etc.">{{ proyecto.descripcion }}</textarea>
+                        <small class="text-muted">Máximo 500 caracteres</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Fecha de Inicio -->
+                    <div class="col-md-4 mb-3">
+                        <label for="fecha_inicio" class="form-label">Fecha de Inicio *</label>
+                        <input 
+                            type="date" 
+                            class="form-control" 
+                            id="fecha_inicio" 
+                            name="fecha_inicio" 
+                            required
+                            value="{{ proyecto.fecha_inicio.strftime('%Y-%m-%d') }}">
+                    </div>
+
+                    <!-- Fecha de Fin -->
+                    <div class="col-md-4 mb-3">
+                        <label for="fecha_fin" class="form-label">Fecha de Fin *</label>
+                        <input 
+                            type="date" 
+                            class="form-control" 
+                            id="fecha_fin" 
+                            name="fecha_fin" 
+                            required
+                            value="{{ proyecto.fecha_fin.strftime('%Y-%m-%d') }}">
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="col-md-4 mb-3">
+                        <label for="estado" class="form-label">Estado *</label>
+                        <select class="form-select" id="estado" name="estado" required>
+                            <option value="activo" {% if proyecto.estado == 'activo' %}selected{% endif %}>Activo</option>
+                            <option value="en_pausa" {% if proyecto.estado == 'en_pausa' %}selected{% endif %}>En Pausa</option>
+                            <option value="completado" {% if proyecto.estado == 'completado' %}selected{% endif %}>Completado</option>
+                            <option value="cancelado" {% if proyecto.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Asignar Miembros -->
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Miembros del Proyecto</label>
+                        <div class="card">
+                            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                {% if miembros %}
+                                    <div class="row">
+                                        {% for miembro in miembros %}
+                                        <div class="col-md-6 mb-2">
+                                            <div class="form-check">
+                                                <input 
+                                                    class="form-check-input" 
+                                                    type="checkbox" 
+                                                    name="miembros" 
+                                                    value="{{ miembro.id_miembro }}" 
+                                                    id="miembro_{{ miembro.id_miembro }}"
+                                                    {% if miembro in proyecto.miembros %}checked{% endif %}>
+                                                <label class="form-check-label" for="miembro_{{ miembro.id_miembro }}">
+                                                    <strong>{{ miembro.nombre }} {{ miembro.apellido }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">{{ miembro.rol }} - {{ miembro.email }}</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">No hay miembros registrados. 
+                                        <a href="{{ url_for('miembros.nuevo') }}">Crear un miembro primero</a>
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <small class="text-muted">También puedes 
+                            <a href="{{ url_for('proyectos.gestionar_miembros', id=proyecto.id_proyecto) }}">gestionar miembros</a> 
+                            desde la página de gestión
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="alert alert-info">
+                    <strong><i class="bi bi-info-circle"></i> Información del Proyecto:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Miembros asignados: <strong>{{ proyecto.miembros|length }}</strong></li>
+                        <li>Tareas totales: <strong>{{ proyecto.tareas|length }}</strong></li>
+                        <li>ID del proyecto: <strong>{{ proyecto.id_proyecto }}</strong></li>
+                    </ul>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-save"></i> Actualizar Proyecto
+                    </button>
+                    <a href="{{ url_for('proyectos.detalle', id=proyecto.id_proyecto) }}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <form method="POST" action="{{ url_for('proyectos.eliminar', id=proyecto.id_proyecto) }}" style="display: inline;" class="float-end">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este proyecto? Se eliminarán también todas sus tareas. Esta acción no se puede deshacer.')">
+                            <i class="bi bi-trash"></i> Eliminar Proyecto
+                        </button>
+                    </form>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Validación: Fecha fin debe ser mayor que fecha inicio
+    document.getElementById('fecha_fin').addEventListener('change', function() {
+        const fechaInicio = document.getElementById('fecha_inicio').value;
+        const fechaFin = this.value;
+        
+        if (fechaInicio && fechaFin && fechaFin < fechaInicio) {
+            alert('La fecha de fin debe ser posterior a la fecha de inicio');
+            this.value = '';
+        }
+    });
+    
+    document.getElementById('fecha_inicio').addEventListener('change', function() {
+        const fechaInicio = this.value;
+        const fechaFin = document.getElementById('fecha_fin').value;
+        
+        if (fechaInicio && fechaFin && fechaFin < fechaInicio) {
+            alert('La fecha de fin debe ser posterior a la fecha de inicio');
+            document.getElementById('fecha_fin').value = '';
+        }
+    });
+</script>
+{% endblock %}

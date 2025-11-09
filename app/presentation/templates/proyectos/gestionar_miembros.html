@@ -1,0 +1,176 @@
+<!-- 
+==================================================
+Gestionar miembros del proyecto
+==================================================
+-->
+{% extends "layout.html" %}
+
+{% block title %}Gestionar Miembros - {{ proyecto.nombre }}{% endblock %}
+
+{% block content %}
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #667eea;">Gestionar Miembros del Proyecto</h2>
+        <div>
+            <a href="{{ url_for('proyectos.detalle', id=proyecto.id_proyecto) }}" class="btn btn-info">
+                <i class="bi bi-eye"></i> Ver Proyecto
+            </a>
+            <a href="{{ url_for('proyectos.listar') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+    
+    {% include('partials/_header.html') %}
+
+    <!-- Información del Proyecto -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5><i class="bi bi-folder"></i> {{ proyecto.nombre }}</h5>
+            <p class="text-muted mb-0">
+                {{ proyecto.descripcion if proyecto.descripcion else 'Sin descripción' }}
+            </p>
+            <div class="mt-2">
+                <span class="badge bg-info">{{ proyecto.miembros|length }} miembros asignados</span>
+                <span class="badge bg-secondary">{{ proyecto.tareas|length }} tareas</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Miembros Asignados -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-check-circle"></i> Miembros Asignados ({{ proyecto.miembros|length }})
+                    </h5>
+                </div>
+                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                    {% if proyecto.miembros %}
+                        <form method="POST" action="{{ url_for('proyectos.actualizar', id=proyecto.id_proyecto) }}">
+                            {% for miembro in proyecto.miembros %}
+                            <div class="card mb-2">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ miembro.nombre }} {{ miembro.apellido }}</h6>
+                                            <small class="text-muted">
+                                                <i class="bi bi-envelope"></i> {{ miembro.email }}<br>
+                                                <i class="bi bi-briefcase"></i> {{ miembro.rol }}
+                                            </small>
+                                            <br>
+                                            <small class="text-info">
+                                                {% set tareas_count = miembro.tareas|selectattr('id_proyecto', 'equalto', proyecto.id_proyecto)|list|length %}
+                                                <i class="bi bi-list-check"></i> {{ tareas_count }} tarea(s) en este proyecto
+                                            </small>
+                                        </div>
+                                        <div>
+                                            <a href="{{ url_for('miembros.detalle', id=miembro.id_miembro) }}" 
+                                               class="btn btn-sm btn-info" 
+                                               title="Ver detalle">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <input type="checkbox" name="miembros" value="{{ miembro.id_miembro }}" checked style="display: none;">
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <button type="submit" class="btn btn-success w-100 mt-2">
+                                <i class="bi bi-save"></i> Guardar Cambios
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-person-x" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="text-muted mt-2">No hay miembros asignados a este proyecto</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Miembros Disponibles -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people"></i> Miembros Disponibles ({{ todos_miembros|length - proyecto.miembros|length }})
+                    </h5>
+                </div>
+                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                    {% set miembros_disponibles = todos_miembros|reject('in', proyecto.miembros)|list %}
+                    
+                    {% if miembros_disponibles %}
+                        <form method="POST" action="{{ url_for('proyectos.actualizar', id=proyecto.id_proyecto) }}">
+                            <!-- Incluir miembros ya asignados como hidden -->
+                            {% for miembro in proyecto.miembros %}
+                            <input type="checkbox" name="miembros" value="{{ miembro.id_miembro }}" checked style="display: none;">
+                            {% endfor %}
+                            
+                            {% for miembro in miembros_disponibles %}
+                            <div class="card mb-2">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="form-check">
+                                                <input 
+                                                    class="form-check-input" 
+                                                    type="checkbox" 
+                                                    name="miembros" 
+                                                    value="{{ miembro.id_miembro }}" 
+                                                    id="add_miembro_{{ miembro.id_miembro }}">
+                                                <label class="form-check-label" for="add_miembro_{{ miembro.id_miembro }}">
+                                                    <h6 class="mb-1">{{ miembro.nombre }} {{ miembro.apellido }}</h6>
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-envelope"></i> {{ miembro.email }}<br>
+                                                        <i class="bi bi-briefcase"></i> {{ miembro.rol }}
+                                                    </small>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-folder"></i> {{ miembro.proyectos|length }} proyecto(s)
+                                                    </small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <a href="{{ url_for('miembros.detalle', id=miembro.id_miembro) }}" 
+                                               class="btn btn-sm btn-info" 
+                                               title="Ver detalle">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <button type="submit" class="btn btn-primary w-100 mt-2">
+                                <i class="bi bi-plus-circle"></i> Asignar Seleccionados
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-check-all" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="text-muted mt-2">Todos los miembros están asignados a este proyecto</p>
+                            <a href="{{ url_for('miembros.nuevo') }}" class="btn btn-primary mt-2">
+                                <i class="bi bi-person-plus"></i> Crear Nuevo Miembro
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ayuda -->
+    <div class="alert alert-info mt-4">
+        <strong><i class="bi bi-lightbulb"></i> Ayuda:</strong>
+        <ul class="mb-0 mt-2">
+            <li>Selecciona los miembros disponibles que quieras agregar al proyecto</li>
+            <li>Los cambios se guardan al hacer clic en "Guardar Cambios" o "Asignar Seleccionados"</li>
+            <li>Para remover un miembro, edita el proyecto desde la página de edición</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

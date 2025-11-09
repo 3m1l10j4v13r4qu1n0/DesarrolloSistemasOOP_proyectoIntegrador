@@ -1,0 +1,148 @@
+<!-- 
+==================================================
+Lista todas las tareas
+==================================================
+-->
+{% extends "layout.html" %}
+
+{% block title %}Tareas{% endblock %}
+
+{% block content %}
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #667eea;">
+            Lista de Tareas
+            {% if proyecto %}
+                - {{ proyecto.nombre }}
+            {% endif %}
+        </h2>
+        {% if proyecto %}
+        <a href="{{ url_for('proyectos.detalle', id=proyecto.id_proyecto) }}" class="btn btn-info">
+            <i class="bi bi-folder"></i> Ver Proyecto
+        </a>
+        {% endif %}
+    </div>
+    
+    {% include('partials/_header.html') %}
+
+    <div style="margin-bottom: 20px;">
+        <a href="{{ url_for('tareas.nuevo') }}" class="btn btn-primary">Crear una nueva Tarea</a>
+        
+        {% if not proyecto %}
+        <div class="btn-group ms-2" role="group">
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="bi bi-filter"></i> Filtrar por Estado
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('tareas.listar') }}">Todas</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('tareas.listar') }}?estado=pendiente">Pendientes</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('tareas.listar') }}?estado=en_progreso">En Progreso</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('tareas.listar') }}?estado=completada">Completadas</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('tareas.listar') }}?estado=cancelada">Canceladas</a></li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if tareas %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Proyecto</th>
+                <th>Asignado a</th>
+                <th>Prioridad</th>
+                <th>Estado</th>
+                <th>Fecha Creación</th>
+                <th>Vencimiento</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tarea in tareas %}
+            <tr>
+                <td>{{ tarea.id_tarea }}</td>
+                <td>
+                    <strong>{{ tarea.titulo }}</strong>
+                    {% if tarea.descripcion %}
+                    <br><small class="text-muted">{{ tarea.descripcion[:50] }}{% if tarea.descripcion|length > 50 %}...{% endif %}</small>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('proyectos.detalle', id=tarea.proyecto.id_proyecto) }}">
+                        {{ tarea.proyecto.nombre }}
+                    </a>
+                </td>
+                <td>
+                    {% if tarea.asignado_a %}
+                        <a href="{{ url_for('miembros.detalle', id=tarea.asignado_a.id_miembro) }}">
+                            {{ tarea.asignado_a.nombre }} {{ tarea.asignado_a.apellido }}
+                        </a>
+                    {% else %}
+                        <span class="text-muted">Sin asignar</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge 
+                        {% if tarea.prioridad == 'urgente' %}bg-danger
+                        {% elif tarea.prioridad == 'alta' %}bg-warning text-dark
+                        {% elif tarea.prioridad == 'media' %}bg-info
+                        {% else %}bg-secondary{% endif %}">
+                        {{ tarea.prioridad|capitalize }}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge 
+                        {% if tarea.estado == 'completada' %}bg-success
+                        {% elif tarea.estado == 'en_progreso' %}bg-primary
+                        {% elif tarea.estado == 'cancelada' %}bg-danger
+                        {% else %}bg-secondary{% endif %}">
+                        {{ tarea.estado|replace('_', ' ')|capitalize }}
+                    </span>
+                </td>
+                <td>
+                    {% if tarea.fecha_creacion %}
+                        {{ tarea.fecha_creacion.strftime('%d/%m/%Y') }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if tarea.fecha_vencimiento %}
+                        {{ tarea.fecha_vencimiento.strftime('%d/%m/%Y') }}
+
+                        {% if tarea.dias_restantes < 0 %}
+                            <br><small class="text-danger"><i class="bi bi-exclamation-triangle"></i> Vencida</small>
+                        {% elif tarea.dias_restantes == 0 %}
+                            <br><small class="text-warning"><i class="bi bi-clock"></i> Hoy</small>
+                        {% elif tarea.dias_restantes <= 3 %}
+                            <br><small class="text-warning"><i class="bi bi-clock"></i> {{ tarea.dias_restantes }} días</small>
+                        {% endif %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('tareas.detalle', id=tarea.id_tarea) }}" class="btn btn-ver">Ver</a>
+                    <a href="{{ url_for('tareas.editar', id=tarea.id_tarea) }}" class="btn btn-editar">Editar</a>
+                    <form method="POST" action="{{ url_for('tareas.eliminar', id=tarea.id_tarea) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta tarea?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; color: #666; margin: 40px 0;">
+        {% if proyecto %}
+            No hay tareas en este proyecto. ¡Crea la primera!
+        {% else %}
+            No hay tareas registradas. ¡Crea la primera!
+        {% endif %}
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

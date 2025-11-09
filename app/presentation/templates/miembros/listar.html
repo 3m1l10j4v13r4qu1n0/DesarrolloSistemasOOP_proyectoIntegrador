@@ -1,0 +1,57 @@
+<!-- 
+==================================================
+Lista todos los miembros
+==================================================
+-->
+{% extends "layout.html" %}
+
+{% block title %}Miembros{% endblock %}
+
+{% block content %}
+<div>
+    <h2 style="color: #667eea; margin-bottom: 20px;">Lista de Miembros</h2>
+    
+    {% include('partials/_header.html') %}
+
+    <a href="{{ url_for('miembros.nuevo') }}" class="btn btn-primary">Crear un nuevo Miembro</a>
+    
+    {% if miembros %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre Completo</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Fecha Ingreso</th>
+                <th>Proyectos</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for miembro in miembros %}
+            <tr>
+                <td>{{ miembro.id_miembro }}</td>
+                <td>{{ miembro.nombre }} {{ miembro.apellido }}</td>
+                <td>{{ miembro.email }}</td>
+                <td>
+                    <span class="badge bg-info">{{ miembro.rol }}</span>
+                </td>
+                <td>{{ miembro.fecha_ingreso.strftime('%d/%m/%Y') }}</td>
+                <td>{{ miembro.proyectos|length }}</td>
+                <td>
+                    <a href="{{ url_for('miembros.detalle', id=miembro.id_miembro) }}" class="btn btn-ver">Ver</a>
+                    <a href="{{ url_for('miembros.editar', id=miembro.id_miembro) }}" class="btn btn-editar">Editar</a>
+                    <form method="POST" action="{{ url_for('miembros.eliminar', id=miembro.id_miembro) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este miembro?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; color: #666; margin: 40px 0;">No hay miembros registrados. ¡Crea el primero!</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
+from datetime import date
 from app.infrastructure.models.tarea_model import TareaModel
 from app.infrastructure.models.proyecto_model import ProyectoModel
 from app.infrastructure.models.miembro_model import MiembroModel
@@ -16,9 +17,10 @@ def nuevo():
     # Capturar id_proyecto si viene por query parameter
     id_proyecto = request.args.get('proyecto', type=int)
     return render_template('tareas/nuevo.html', 
-                         proyectos=proyectos, 
-                         miembros=miembros,
-                         id_proyecto=id_proyecto)
+                            proyectos=proyectos, 
+                            miembros=miembros,
+                            id_proyecto=id_proyecto
+                            )
 
 # CREATE - Guardar nueva tarea
 @tareas_bp.route('/crear', methods=['POST'])
@@ -62,6 +64,7 @@ def listar():
     else:
         tareas = TareaModel.query.all()
         proyecto = None
+        hoy = date.today()
     
     return render_template('tareas/listar.html', tareas=tareas, proyecto=proyecto)
 

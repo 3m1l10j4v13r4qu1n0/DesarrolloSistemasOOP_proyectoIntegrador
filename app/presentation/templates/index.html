@@ -52,8 +52,9 @@
     </div>
     
     <div style="margin-top: 40px;">
-        <a href="#" class="btn btn-primary" style="margin: 10px;">Ver Proyectos</a>
-        <a href="#" class="btn btn-primary" style="margin: 10px;">Ver Tareas</a>
+        <a href="{{url_for('proyectos.listar')}}" class="btn btn-primary" style="margin: 10px;">Ver Proyectos</a>
+        <a href="{{url_for('tareas.listar')}}" class="btn btn-primary" style="margin: 10px;">Ver Tareas</a>
     </div>
+    
 </div>
 {% endblock %}

@@ -22,6 +22,13 @@ class TareaModel(db.Model):
     proyecto = db.relationship("ProyectoModel", back_populates="tareas")
     asignado_a = db.relationship("MiembroModel", back_populates="tareas")
     
+    @property
+    def dias_restantes(self):
+        if not self.fecha_vencimiento:
+            return None
+        return (self.fecha_vencimiento - date.today()).days
+
+
     @staticmethod
     def from_entity(tarea: Tarea) -> 'TareaModel':
         """Convierte entidad de dominio a modelo de persistencia"""

@@ -2,8 +2,8 @@
     <h1>{% block header %}Aplicación MVC con Flask{% endblock %}</h1>
         <nav>
             <a href="/">🏛 Inicio</a>
-            <a href="{{url_for('miembros.ver_miembros')}}">🙋🏽‍♂️ Miembros</a>
-            <a href="{{url_for('proyectos.ver_proyectos')}}">💼 Proyectos</a>
-            <a href="{{url_for('tareas.ver_tareas')}}">📝 Tareas</a>
+            <a href="{{url_for('miembros.crear')}}">🙋🏽‍♂️ Nuevo Miembro</a>
+            <a href="{{url_for('proyectos.nuevo')}}">💼 Nuevo Proyecto</a>
+            <a href="{{url_for('tareas.nuevo')}}">📝 Nueva Tarea</a>
         </nav>
 </header>

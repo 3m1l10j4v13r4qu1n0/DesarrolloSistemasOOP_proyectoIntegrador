@@ -112,6 +112,20 @@ table tr:hover {
 .btn-danger:hover {
                     background: #c82333;
                   }
+.btn-ver {
+  background-color: #0d6efd; /* Azul Bootstrap */
+  color: white;
+}
+.btn-ver:hover {
+  background-color: #0b5ed7;
+}
+.btn-editar {
+  background-color: #ffc107; /* Amarillo */
+  color: black;
+}
+.btn-editar:hover {
+  background-color: #e0a800;
+}
 form  {
         max-width: 600px;
         margin: 20px auto;

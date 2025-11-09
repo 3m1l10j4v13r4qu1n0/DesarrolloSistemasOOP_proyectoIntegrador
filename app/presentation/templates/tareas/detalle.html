@@ -1,0 +1,195 @@
+<!-- 
+==================================================
+Detalle de una tarea específica
+==================================================
+-->
+{% extends "layout.html" %}
+
+{% block title %}Detalle de Tarea{% endblock %}
+
+{% block content %}
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #667eea;">Detalle de la Tarea</h2>
+        <div>
+            <a href="{{ url_for('proyectos.detalle', id=tarea.proyecto.id_proyecto) }}" class="btn btn-info">
+                <i class="bi bi-folder"></i> Ver Proyecto
+            </a>
+            <a href="{{ url_for('tareas.listar') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+    
+    {% include('partials/_header.html') %}
+
+    <!-- Información de la Tarea -->
+    <div class="card">
+        <div class="card-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 class="mb-0">
+                    <i class="bi bi-check2-square"></i> 
+                    {{ tarea.titulo }}
+                </h4>
+                <div>
+                    <span class="badge 
+                        {% if tarea.prioridad == 'urgente' %}bg-danger
+                        {% elif tarea.prioridad == 'alta' %}bg-warning text-dark
+                        {% elif tarea.prioridad == 'media' %}bg-info
+                        {% else %}bg-secondary{% endif %}" style="font-size: 1rem;">
+                        {{ tarea.prioridad|capitalize }}
+                    </span>
+                    <span class="badge 
+                        {% if tarea.estado == 'completada' %}bg-success
+                        {% elif tarea.estado == 'en_progreso' %}bg-primary
+                        {% elif tarea.estado == 'cancelada' %}bg-danger
+                        {% else %}bg-secondary{% endif %}" style="font-size: 1rem;">
+                        {{ tarea.estado|replace('_', ' ')|capitalize }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>ID:</strong> {{ tarea.id_tarea }}</p>
+                    <p><strong>Proyecto:</strong> 
+                        <a href="{{ url_for('proyectos.detalle', id=tarea.proyecto.id_proyecto) }}">
+                            {{ tarea.proyecto.nombre }}
+                        </a>
+                    </p>
+                    <p><strong>Asignado a:</strong> 
+                        {% if tarea.asignado_a %}
+                            <a href="{{ url_for('miembros.detalle', id=tarea.asignado_a.id_miembro) }}">
+                                {{ tarea.asignado_a.nombre }} {{ tarea.asignado_a.apellido }}
+                            </a>
+                            <br>
+                            <small class="text-muted">{{ tarea.asignado_a.rol }} - {{ tarea.asignado_a.email }}</small>
+                        {% else %}
+                            <span class="text-muted">Sin asignar</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Fecha de Creación:</strong> 
+                        {% if tarea.fecha_creacion %}
+                            {{ tarea.fecha_creacion.strftime('%d/%m/%Y') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+                    <p><strong>Fecha de Vencimiento:</strong> 
+                        {% if tarea.fecha_vencimiento %}
+                            {{ tarea.fecha_vencimiento.strftime('%d/%m/%Y') }}
+
+                            {% if tarea.dias_restantes < 0 %}
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-exclamation-triangle"></i> Vencida hace {{ -tarea.dias_restantes }} día(s)
+                                </span>
+                            {% elif tarea.dias_restantes == 0 %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-clock"></i> Vence Hoy
+                                </span>
+                            {% elif tarea.dias_restantes <= 3 %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-clock"></i> Vence en {{ tarea.dias_restantes }} día(s)
+                                </span>
+                            {% else %}
+                                <span class="badge bg-info">
+                                    {{ tarea.dias_restantes }} días restantes
+                                </span>
+                            {% endif %}
+
+                            <span class="text-muted">Sin fecha de vencimiento</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <p><strong>Descripción:</strong></p>
+                    <div class="alert alert-light">
+                        {{ tarea.descripcion if tarea.descripcion else 'Sin descripción' }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cambio Rápido de Estado -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <strong>Cambiar Estado:</strong>
+                    <form method="POST" action="{{ url_for('tareas.cambiar_estado', id=tarea.id_tarea) }}" style="display: inline-block; margin-left: 10px;">
+                        <div class="btn-group" role="group">
+                            <button type="submit" name="estado" value="pendiente" 
+                                    class="btn btn-sm {% if tarea.estado == 'pendiente' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+                                Pendiente
+                            </button>
+                            <button type="submit" name="estado" value="en_progreso" 
+                                    class="btn btn-sm {% if tarea.estado == 'en_progreso' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                En Progreso
+                            </button>
+                            <button type="submit" name="estado" value="completada" 
+                                    class="btn btn-sm {% if tarea.estado == 'completada' %}btn-success{% else %}btn-outline-success{% endif %}">
+                                Completada
+                            </button>
+                            <button type="submit" name="estado" value="cancelada" 
+                                    class="btn btn-sm {% if tarea.estado == 'cancelada' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                Cancelada
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="mt-3">
+                <a href="{{ url_for('tareas.editar', id=tarea.id_tarea) }}" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Editar Tarea
+                </a>
+                <a href="{{ url_for('proyectos.detalle', id=tarea.proyecto.id_proyecto) }}" class="btn btn-info">
+                    <i class="bi bi-folder"></i> Ir al Proyecto
+                </a>
+                {% if tarea.asignado_a %}
+                <a href="{{ url_for('miembros.detalle', id=tarea.asignado_a.id_miembro) }}" class="btn btn-info">
+                    <i class="bi bi-person"></i> Ver Miembro
+                </a>
+                {% endif %}
+                <form method="POST" action="{{ url_for('tareas.eliminar', id=tarea.id_tarea) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta tarea?')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Proyecto -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-folder"></i> Proyecto Asociado</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5>{{ tarea.proyecto.nombre }}</h5>
+                    <p class="text-muted">{{ tarea.proyecto.descripcion if tarea.proyecto.descripcion else 'Sin descripción' }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <p><strong>Estado:</strong> 
+                        <span class="badge 
+                            {% if tarea.proyecto.estado == 'activo' %}bg-success
+                            {% elif tarea.proyecto.estado == 'completado' %}bg-primary
+                            {% else %}bg-secondary{% endif %}">
+                            {{ tarea.proyecto.estado|capitalize }}
+                        </span>
+                    </p>
+                    <p><strong>Miembros:</strong> {{ tarea.proyecto.miembros|length }}</p>
+                    <p><strong>Tareas:</strong> {{ tarea.proyecto.tareas|length }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

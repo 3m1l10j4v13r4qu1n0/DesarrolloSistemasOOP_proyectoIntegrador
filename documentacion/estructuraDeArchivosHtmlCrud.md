@@ -134,8 +134,8 @@ def create_app(config_class=Config):
         
         #Importo rutas 
         from .presentation.routes.main import main as main_blueprint
-        from .presentation.routes.proyecto_routes import proyecto_bp as proyecto_blueprint
-        from .presentation.routes.tarea_routes import tarea_bp as tarea_blueprint
+        from .presentation.routes.proyecto_routes import proyectos_bp as proyecto_blueprint
+        from .presentation.routes.tarea_routes import tareas_bp as tarea_blueprint
         from .presentation.routes.miembro_routes import miembros_bp as miembro_blueprint
         
         #Reguistro las rutas en la app
