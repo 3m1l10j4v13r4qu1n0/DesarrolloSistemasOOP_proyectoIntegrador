@@ -164,10 +164,3 @@ def create_app(config_class=Config):
 
 ---
 
-## 📌 Próximos Pasos
-
-1. Crear los archivos HTML en la estructura indicada
-2. Diseñar el template layaout con Bootstrap/Tailwind
-3. Implementar formularios con validación del lado cliente
-4. Agregar confirmaciones para eliminar (modales o JavaScript)
-5. Opcional: Agregar búsqueda, paginación y ordenamiento
