@@ -36,8 +36,8 @@ Lista todos los proyectos
                 <td>{{ proyecto.id_proyecto }}</td>
                 <td><strong>{{ proyecto.nombre }}</strong></td>
                 <td>{{ proyecto.descripcion[:50] }}{% if proyecto.descripcion|length > 50 %}...{% endif %}</td>
-                <td>{{ proyecto.fecha_inicio.strftime('%d/%m/%Y') }}</td>
-                <td>{{ proyecto.fecha_fin.strftime('%d/%m/%Y') }}</td>
+                <td>{{ proyecto.fecha_inicio }}</td>
+                <td>{{ proyecto.fecha_fin }}</td>
                 <td>
                     <span class="badge 
                         {% if proyecto.estado == 'activo' %}bg-success

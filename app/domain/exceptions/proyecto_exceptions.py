@@ -107,3 +107,8 @@ class FechaInvalidaError(Exception):
     
     def __str__(self):
         return f"Error de fecha: {self.mensaje}"
+    
+
+class EmailDuplicadoError(DatoInvalidoError):
+    """Error específico para emails duplicados"""
+    pass

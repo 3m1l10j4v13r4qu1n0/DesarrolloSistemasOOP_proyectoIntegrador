@@ -8,6 +8,9 @@
 </head>
 <body>
     <div class="container">
+        <!-- Mensajes flash -->
+        {% include 'components/flash_messages.html' %}
+
         {% block content %}
         {% endblock %}
         {% include('partials/_footer.html') %}  

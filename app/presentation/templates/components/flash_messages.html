@@ -1,0 +1,130 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-messages-container">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {% if category == 'success' %}
+            <i class="fas fa-check-circle"></i>
+          {% elif category == 'error' %}
+            <i class="fas fa-exclamation-circle"></i>
+          {% elif category == 'warning' %}
+            <i class="fas fa-exclamation-triangle"></i>
+          {% elif category == 'info' %}
+            <i class="fas fa-info-circle"></i>
+          {% endif %}
+          
+          <span class="message-text">{{ message }}</span>
+          
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<style>
+  .flash-messages-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+  }
+  
+  .alert {
+    margin-bottom: 10px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .alert i {
+    margin-right: 10px;
+    font-size: 1.2em;
+  }
+  
+  .alert-success {
+    background-color: #d4edda;
+    border-left: 4px solid #28a745;
+    color: #155724;
+  }
+  
+  .alert-error {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+    color: #721c24;
+  }
+  
+  .alert-warning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    color: #856404;
+  }
+  
+  .alert-info {
+    background-color: #d1ecf1;
+    border-left: 4px solid #17a2b8;
+    color: #0c5460;
+  }
+  
+  .btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.5;
+    padding: 0;
+    margin-left: 15px;
+  }
+  
+  .btn-close:hover {
+    opacity: 1;
+  }
+  
+  .message-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  /* Auto-hide después de 5 segundos */
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(400px);
+    }
+  }
+  
+  .alert.auto-hide {
+    animation: fadeOut 0.5s ease-out 4.5s forwards;
+  }
+</style>
+
+<script>
+  // Auto-cerrar mensajes después de 5 segundos
+  document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+      alert.classList.add('auto-hide');
+      setTimeout(function() {
+        alert.remove();
+      }, 5000);
+    });
+  });
+</script>
+

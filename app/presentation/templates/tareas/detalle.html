@@ -1,6 +1,6 @@
 <!-- 
 ==================================================
-Detalle de una tarea específica
+Detalle de una tarea específica - CORREGIDO
 ==================================================
 -->
 {% extends "layout.html" %}
@@ -12,9 +12,11 @@ Detalle de una tarea específica
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 style="color: #667eea;">Detalle de la Tarea</h2>
         <div>
-            <a href="{{ url_for('proyectos.detalle', id=tarea.proyecto.id_proyecto) }}" class="btn btn-info">
+            {% if proyecto %}
+            <a href="{{ url_for('proyectos.detalle', id=proyecto.id_proyecto) }}" class="btn btn-info">
                 <i class="bi bi-folder"></i> Ver Proyecto
             </a>
+            {% endif %}
             <a href="{{ url_for('tareas.listar') }}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Volver
             </a>
@@ -42,7 +44,7 @@ Detalle de una tarea específica
                     <span class="badge 
                         {% if tarea.estado == 'completada' %}bg-success
                         {% elif tarea.estado == 'en_progreso' %}bg-primary
-                        {% elif tarea.estado == 'cancelada' %}bg-danger
+                        {% elif tarea.estado == 'bloqueada' %}bg-danger
                         {% else %}bg-secondary{% endif %}" style="font-size: 1rem;">
                         {{ tarea.estado|replace('_', ' ')|capitalize }}
                     </span>
@@ -54,17 +56,21 @@ Detalle de una tarea específica
                 <div class="col-md-6">
                     <p><strong>ID:</strong> {{ tarea.id_tarea }}</p>
                     <p><strong>Proyecto:</strong> 
-                        <a href="{{ url_for('proyectos.detalle', id=tarea.proyecto.id_proyecto) }}">
-                            {{ tarea.proyecto.nombre }}
-                        </a>
+                        {% if proyecto %}
+                            <a href="{{ url_for('proyectos.detalle', id=proyecto.id_proyecto) }}">
+                                {{ proyecto.nombre }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted">No asignado</span>
+                        {% endif %}
                     </p>
                     <p><strong>Asignado a:</strong> 
-                        {% if tarea.asignado_a %}
-                            <a href="{{ url_for('miembros.detalle', id=tarea.asignado_a.id_miembro) }}">
-                                {{ tarea.asignado_a.nombre }} {{ tarea.asignado_a.apellido }}
+                        {% if miembro_asignado %}
+                            <a href="{{ url_for('miembros.detalle', id=miembro_asignado.id_miembro) }}">
+                                {{ miembro_asignado.nombre }} {{ miembro_asignado.apellido }}
                             </a>
                             <br>
-                            <small class="text-muted">{{ tarea.asignado_a.rol }} - {{ tarea.asignado_a.email }}</small>
+                            <small class="text-muted">{{ miembro_asignado.rol }} - {{ miembro_asignado.email }}</small>
                         {% else %}
                             <span class="text-muted">Sin asignar</span>
                         {% endif %}
@@ -73,33 +79,34 @@ Detalle de una tarea específica
                 <div class="col-md-6">
                     <p><strong>Fecha de Creación:</strong> 
                         {% if tarea.fecha_creacion %}
-                            {{ tarea.fecha_creacion.strftime('%d/%m/%Y') }}
+                            {{ tarea.fecha_creacion }}
                         {% else %}
                             -
                         {% endif %}
                     </p>
                     <p><strong>Fecha de Vencimiento:</strong> 
                         {% if tarea.fecha_vencimiento %}
-                            {{ tarea.fecha_vencimiento.strftime('%d/%m/%Y') }}
+                            {{ tarea.fecha_vencimiento }}
 
-                            {% if tarea.dias_restantes < 0 %}
+                            {% if tarea.esta_vencida() and tarea.estado != 'completada' %}
                                 <span class="badge bg-danger">
-                                    <i class="bi bi-exclamation-triangle"></i> Vencida hace {{ -tarea.dias_restantes }} día(s)
-                                </span>
-                            {% elif tarea.dias_restantes == 0 %}
-                                <span class="badge bg-warning text-dark">
-                                    <i class="bi bi-clock"></i> Vence Hoy
-                                </span>
-                            {% elif tarea.dias_restantes <= 3 %}
-                                <span class="badge bg-warning text-dark">
-                                    <i class="bi bi-clock"></i> Vence en {{ tarea.dias_restantes }} día(s)
+                                    <i class="bi bi-exclamation-triangle"></i> Vencida
                                 </span>
                             {% else %}
-                                <span class="badge bg-info">
-                                    {{ tarea.dias_restantes }} días restantes
-                                </span>
+                                {# Calcular días restantes manualmente si es necesario #}
+                                {% set fecha_vencimiento = tarea.fecha_vencimiento %}
+                                {% set hoy = now().strftime('%Y-%m-%d') %}
+                                {% if fecha_vencimiento == hoy %}
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-clock"></i> Vence Hoy
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-info">
+                                        Próxima
+                                    </span>
+                                {% endif %}
                             {% endif %}
-
+                        {% else %}
                             <span class="text-muted">Sin fecha de vencimiento</span>
                         {% endif %}
                     </p>
@@ -133,12 +140,44 @@ Detalle de una tarea específica
                                     class="btn btn-sm {% if tarea.estado == 'completada' %}btn-success{% else %}btn-outline-success{% endif %}">
                                 Completada
                             </button>
-                            <button type="submit" name="estado" value="cancelada" 
-                                    class="btn btn-sm {% if tarea.estado == 'cancelada' %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                                Cancelada
+                            <button type="submit" name="estado" value="bloqueada" 
+                                    class="btn btn-sm {% if tarea.estado == 'bloqueada' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                Bloqueada
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Botones de Acción Rápida -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <strong>Acciones Rápidas:</strong>
+                    <div style="display: inline-block; margin-left: 10px;">
+                        {% if tarea.estado != 'completada' and tarea.id_miembro_asignado %}
+                        <form method="POST" action="{{ url_for('tareas.completar_tarea', id=tarea.id_tarea) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-success btn-sm">
+                                <i class="bi bi-check-circle"></i> Completar
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        {% if tarea.estado != 'bloqueada' %}
+                        <form method="POST" action="{{ url_for('tareas.bloquear_tarea', id=tarea.id_tarea) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-warning btn-sm">
+                                <i class="bi bi-pause-circle"></i> Bloquear
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        {% if tarea.id_miembro_asignado %}
+                        <form method="POST" action="{{ url_for('tareas.desasignar_tarea', id=tarea.id_tarea) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('¿Desasignar esta tarea?')">
+                                <i class="bi bi-person-dash"></i> Desasignar
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
@@ -148,11 +187,13 @@ Detalle de una tarea específica
                 <a href="{{ url_for('tareas.editar', id=tarea.id_tarea) }}" class="btn btn-warning">
                     <i class="bi bi-pencil"></i> Editar Tarea
                 </a>
-                <a href="{{ url_for('proyectos.detalle', id=tarea.proyecto.id_proyecto) }}" class="btn btn-info">
+                {% if proyecto %}
+                <a href="{{ url_for('proyectos.detalle', id=proyecto.id_proyecto) }}" class="btn btn-info">
                     <i class="bi bi-folder"></i> Ir al Proyecto
                 </a>
-                {% if tarea.asignado_a %}
-                <a href="{{ url_for('miembros.detalle', id=tarea.asignado_a.id_miembro) }}" class="btn btn-info">
+                {% endif %}
+                {% if miembro_asignado %}
+                <a href="{{ url_for('miembros.detalle', id=miembro_asignado.id_miembro) }}" class="btn btn-info">
                     <i class="bi bi-person"></i> Ver Miembro
                 </a>
                 {% endif %}
@@ -166,6 +207,7 @@ Detalle de una tarea específica
     </div>
 
     <!-- Información del Proyecto -->
+    {% if proyecto %}
     <div class="card mt-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="bi bi-folder"></i> Proyecto Asociado</h5>
@@ -173,23 +215,102 @@ Detalle de una tarea específica
         <div class="card-body">
             <div class="row">
                 <div class="col-md-8">
-                    <h5>{{ tarea.proyecto.nombre }}</h5>
-                    <p class="text-muted">{{ tarea.proyecto.descripcion if tarea.proyecto.descripcion else 'Sin descripción' }}</p>
+                    <h5>{{ proyecto.nombre }}</h5>
+                    <p class="text-muted">{{ proyecto.descripcion if proyecto.descripcion else 'Sin descripción' }}</p>
+                    <p>
+                        <strong>Fechas:</strong> 
+                        {{ proyecto.fecha_inicio }} - {{ proyecto.fecha_fin }}
+                    </p>
                 </div>
                 <div class="col-md-4 text-end">
                     <p><strong>Estado:</strong> 
                         <span class="badge 
-                            {% if tarea.proyecto.estado == 'activo' %}bg-success
-                            {% elif tarea.proyecto.estado == 'completado' %}bg-primary
+                            {% if proyecto.estado == 'activo' %}bg-success
+                            {% elif proyecto.estado == 'finalizado' %}bg-primary
                             {% else %}bg-secondary{% endif %}">
-                            {{ tarea.proyecto.estado|capitalize }}
+                            {{ proyecto.estado|capitalize }}
                         </span>
                     </p>
-                    <p><strong>Miembros:</strong> {{ tarea.proyecto.miembros|length }}</p>
-                    <p><strong>Tareas:</strong> {{ tarea.proyecto.tareas|length }}</p>
+                    <p>
+                        <a href="{{ url_for('tareas.listar') }}?proyecto={{ proyecto.id_proyecto }}" class="btn btn-outline-primary btn-sm">
+                            Ver todas las tareas
+                        </a>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
+    {% endif %}
+
+    <!-- Información del Miembro Asignado -->
+    {% if miembro_asignado %}
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-person"></i> Miembro Asignado</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5>{{ miembro_asignado.nombre }} {{ miembro_asignado.apellido }}</h5>
+                    <p class="text-muted">{{ miembro_asignado.email }}</p>
+                    <p><strong>Rol:</strong> {{ miembro_asignado.rol }}</p>
+                    <p><strong>Fecha de Ingreso:</strong> {{ miembro_asignado.fecha_ingreso }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <p>
+                        <a href="{{ url_for('tareas.listar') }}?miembro={{ miembro_asignado.id_miembro }}" class="btn btn-outline-primary btn-sm">
+                            Ver todas sus tareas
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px 10px 0 0 !important;
+    padding: 15px 20px;
+}
+
+.card-header h4, .card-header h5 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.alert-light {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.btn-group .btn {
+    border-radius: 6px;
+    margin: 2px;
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+}
+</style>
 {% endblock %}

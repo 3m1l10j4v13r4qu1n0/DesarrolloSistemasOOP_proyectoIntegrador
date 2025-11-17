@@ -68,3 +68,4 @@ class TareaModel(db.Model):
         self.fecha_vencimiento = date.fromisoformat(tarea.fecha_vencimiento) if tarea.fecha_vencimiento else None
 
 
+

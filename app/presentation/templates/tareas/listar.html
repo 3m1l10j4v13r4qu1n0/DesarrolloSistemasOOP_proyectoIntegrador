@@ -1,6 +1,6 @@
 <!-- 
 ==================================================
-Lista todas las tareas
+Lista todas las tareas - CORREGIDO
 ==================================================
 -->
 {% extends "layout.html" %}
@@ -39,13 +39,13 @@ Lista todas las tareas
                 <li><a class="dropdown-item" href="{{ url_for('tareas.listar') }}?estado=pendiente">Pendientes</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('tareas.listar') }}?estado=en_progreso">En Progreso</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('tareas.listar') }}?estado=completada">Completadas</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('tareas.listar') }}?estado=cancelada">Canceladas</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('tareas.listar') }}?estado=bloqueada">Bloqueadas</a></li>
             </ul>
         </div>
         {% endif %}
     </div>
     
-    {% if tareas %}
+    {% if tareas_con_proyecto %}
     <table>
         <thead>
             <tr>
@@ -61,24 +61,28 @@ Lista todas las tareas
             </tr>
         </thead>
         <tbody>
-            {% for tarea in tareas %}
+            {% for item in tareas_con_proyecto %}
             <tr>
-                <td>{{ tarea.id_tarea }}</td>
+                <td>{{ item.tarea.id_tarea }}</td>
                 <td>
-                    <strong>{{ tarea.titulo }}</strong>
-                    {% if tarea.descripcion %}
-                    <br><small class="text-muted">{{ tarea.descripcion[:50] }}{% if tarea.descripcion|length > 50 %}...{% endif %}</small>
+                    <strong>{{ item.tarea.titulo }}</strong>
+                    {% if item.tarea.descripcion %}
+                    <br><small class="text-muted">{{ item.tarea.descripcion[:50] }}{% if item.tarea.descripcion|length > 50 %}...{% endif %}</small>
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{{ url_for('proyectos.detalle', id=tarea.proyecto.id_proyecto) }}">
-                        {{ tarea.proyecto.nombre }}
-                    </a>
+                    {% if item.proyecto %}
+                        <a href="{{ url_for('proyectos.detalle', id=item.proyecto.id_proyecto) }}">
+                            {{ item.proyecto.nombre }}
+                        </a>
+                    {% else %}
+                        <span class="text-muted">No asignado</span>
+                    {% endif %}
                 </td>
                 <td>
-                    {% if tarea.asignado_a %}
-                        <a href="{{ url_for('miembros.detalle', id=tarea.asignado_a.id_miembro) }}">
-                            {{ tarea.asignado_a.nombre }} {{ tarea.asignado_a.apellido }}
+                    {% if item.miembro_asignado %}
+                        <a href="{{ url_for('miembros.detalle', id=item.miembro_asignado.id_miembro) }}">
+                            {{ item.miembro_asignado.nombre }} {{ item.miembro_asignado.apellido }}
                         </a>
                     {% else %}
                         <span class="text-muted">Sin asignar</span>
@@ -86,50 +90,68 @@ Lista todas las tareas
                 </td>
                 <td>
                     <span class="badge 
-                        {% if tarea.prioridad == 'urgente' %}bg-danger
-                        {% elif tarea.prioridad == 'alta' %}bg-warning text-dark
-                        {% elif tarea.prioridad == 'media' %}bg-info
+                        {% if item.tarea.prioridad == 'urgente' %}bg-danger
+                        {% elif item.tarea.prioridad == 'alta' %}bg-warning text-dark
+                        {% elif item.tarea.prioridad == 'media' %}bg-info
                         {% else %}bg-secondary{% endif %}">
-                        {{ tarea.prioridad|capitalize }}
+                        {{ item.tarea.prioridad|capitalize }}
                     </span>
                 </td>
                 <td>
                     <span class="badge 
-                        {% if tarea.estado == 'completada' %}bg-success
-                        {% elif tarea.estado == 'en_progreso' %}bg-primary
-                        {% elif tarea.estado == 'cancelada' %}bg-danger
+                        {% if item.tarea.estado == 'completada' %}bg-success
+                        {% elif item.tarea.estado == 'en_progreso' %}bg-primary
+                        {% elif item.tarea.estado == 'bloqueada' %}bg-danger
                         {% else %}bg-secondary{% endif %}">
-                        {{ tarea.estado|replace('_', ' ')|capitalize }}
+                        {{ item.tarea.estado|replace('_', ' ')|capitalize }}
                     </span>
                 </td>
                 <td>
-                    {% if tarea.fecha_creacion %}
-                        {{ tarea.fecha_creacion.strftime('%d/%m/%Y') }}
+                    {% if item.tarea.fecha_creacion %}
+                        {{ item.tarea.fecha_creacion }}
                     {% else %}
                         -
                     {% endif %}
                 </td>
                 <td>
-                    {% if tarea.fecha_vencimiento %}
-                        {{ tarea.fecha_vencimiento.strftime('%d/%m/%Y') }}
+                    {% if item.tarea.fecha_vencimiento %}
+                        {{ item.tarea.fecha_vencimiento }}
 
-                        {% if tarea.dias_restantes < 0 %}
+                        {% if item.tarea.esta_vencida() and item.tarea.estado != 'completada' %}
                             <br><small class="text-danger"><i class="bi bi-exclamation-triangle"></i> Vencida</small>
-                        {% elif tarea.dias_restantes == 0 %}
-                            <br><small class="text-warning"><i class="bi bi-clock"></i> Hoy</small>
-                        {% elif tarea.dias_restantes <= 3 %}
-                            <br><small class="text-warning"><i class="bi bi-clock"></i> {{ tarea.dias_restantes }} días</small>
+                        {% else %}
+                            {# Calcular días restantes manualmente si es necesario #}
+                            {% set fecha_vencimiento = item.tarea.fecha_vencimiento %}
+                            {% set hoy = now().strftime('%Y-%m-%d') %}
+                            {% if fecha_vencimiento == hoy %}
+                                <br><small class="text-warning"><i class="bi bi-clock"></i> Hoy</small>
+                            {% endif %}
                         {% endif %}
                     {% else %}
                         -
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{{ url_for('tareas.detalle', id=tarea.id_tarea) }}" class="btn btn-ver">Ver</a>
-                    <a href="{{ url_for('tareas.editar', id=tarea.id_tarea) }}" class="btn btn-editar">Editar</a>
-                    <form method="POST" action="{{ url_for('tareas.eliminar', id=tarea.id_tarea) }}" style="display: inline;">
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta tarea?')">Eliminar</button>
-                    </form>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <a href="{{ url_for('tareas.detalle', id=item.tarea.id_tarea) }}" class="btn btn-ver">Ver</a>
+                        <a href="{{ url_for('tareas.editar', id=item.tarea.id_tarea) }}" class="btn btn-editar">Editar</a>
+                        
+                        <!-- Formulario para cambiar estado rápido -->
+                        <form method="POST" action="{{ url_for('tareas.cambiar_estado', id=item.tarea.id_tarea) }}" style="display: inline;">
+                            <select name="estado" onchange="this.form.submit()" class="form-select form-select-sm" style="width: 120px;">
+                                <option value="pendiente" {% if item.tarea.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                <option value="en_progreso" {% if item.tarea.estado == 'en_progreso' %}selected{% endif %}>En Progreso</option>
+                                <option value="completada" {% if item.tarea.estado == 'completada' %}selected{% endif %}>Completada</option>
+                                <option value="bloqueada" {% if item.tarea.estado == 'bloqueada' %}selected{% endif %}>Bloqueada</option>
+                            </select>
+                        </form>
+                        
+                        <form method="POST" action="{{ url_for('tareas.eliminar', id=item.tarea.id_tarea) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta tarea?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             {% endfor %}
@@ -145,4 +167,69 @@ Lista todas las tareas
     </p>
     {% endif %}
 </div>
+
+<style>
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+table th {
+    background: #667eea;
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-ver {
+    background: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-editar {
+    background: #ffc107;
+    color: black;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-ver:hover, .btn-editar:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.badge {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+
+.form-select-sm {
+    font-size: 12px;
+    padding: 4px 8px;
+}
+</style>
 {% endblock %}

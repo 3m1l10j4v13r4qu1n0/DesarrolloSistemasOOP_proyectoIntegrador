@@ -37,7 +37,7 @@ Lista todos los miembros
                 <td>
                     <span class="badge bg-info">{{ miembro.rol }}</span>
                 </td>
-                <td>{{ miembro.fecha_ingreso.strftime('%d/%m/%Y') }}</td>
+                <td>{{ miembro.fecha_ingreso}}</td>
                 <td>{{ miembro.proyectos|length }}</td>
                 <td>
                     <a href="{{ url_for('miembros.detalle', id=miembro.id_miembro) }}" class="btn btn-ver">Ver</a>
