@@ -116,9 +116,9 @@ def detalle(id_tarea):
 
 # UPDATE - Mostrar formulario de edición
 @tareas_bp.route('/editar/<int:id_tarea>', methods=['GET'])
-def editar(id):
+def editar(id_tarea):
     try:
-        tarea = tarea_service.obtener_tarea(id)
+        tarea = tarea_service.obtener_tarea(id_tarea)
         if not tarea:
             flash('Tarea no encontrada', 'error')
             print('FLASH:', 'Tarea no encontrada', 'error')
@@ -141,10 +141,10 @@ def editar(id):
 
 # UPDATE — Actualizar tarea
 @tareas_bp.route('/actualizar/<int:id_tarea>', methods=['POST'])
-def actualizar(id):
+def actualizar(id_tarea):
     try:
         tarea_actualizada = tarea_service.actualizar_tarea(
-            id_tarea=id,
+            id_tarea=id_tarea,
             titulo=request.form.get('titulo'),
             descripcion=request.form.get('descripcion', ''),
             prioridad=request.form.get('prioridad', 'media'),
@@ -155,36 +155,36 @@ def actualizar(id):
         nuevo_miembro_id = request.form.get('id_miembro_asignado')
         if nuevo_miembro_id:
             try:
-                tarea_service.asignar_tarea(id, int(nuevo_miembro_id))
+                tarea_service.asignar_tarea(id_tarea, int(nuevo_miembro_id))
             except (NoEncontradoError, AsignacionInvalidaError) as e:
                 flash(f'No se pudo asignar miembro: {str(e)}', 'warning')
                 print('FLASH:', f'No se pudo asignar miembro: {str(e)}', 'warning')
         else:
             try:
-                tarea_service.desasignar_tarea(id)
+                tarea_service.desasignar_tarea(id_tarea)
             except Exception as e:
                 flash(f'No se pudo desasignar tarea: {str(e)}', 'warning')
                 print('FLASH:', f'No se pudo desasignar tarea: {str(e)}', 'warning')
 
         flash('Tarea actualizada exitosamente', 'success')
         print('FLASH:', 'Tarea actualizada exitosamente', 'success')
-        return redirect(url_for('tareas.detalle', id=id))
+        return redirect(url_for('tareas.detalle', id_tarea=id_tarea))
 
     except (DatoInvalidoError, FechaInvalidaError) as e:
         flash(f'Error de validación: {str(e)}', 'error')
         print('FLASH:', f'Error de validación: {str(e)}', 'error')
-        return redirect(url_for('tareas.editar', id=id))
+        return redirect(url_for('tareas.editar', id_tarea=id_tarea))
 
     except Exception as e:
         flash(f'Error al actualizar tarea: {str(e)}', 'error')
         print('FLASH:', f'Error al actualizar tarea: {str(e)}', 'error')
-        return redirect(url_for('tareas.editar', id=id))
+        return redirect(url_for('tareas.editar', id_tarea=id_tarea))
 
 # DELETE - Eliminar tarea
 @tareas_bp.route('/eliminar/<int:id_tarea>', methods=['POST'])
-def eliminar(id):
+def eliminar(id_tarea):
     try:
-        resultado = tarea_service.eliminar_tarea(id)
+        resultado = tarea_service.eliminar_tarea(id_tarea)
         if resultado:
             flash('Tarea eliminada exitosamente', 'success')
             print('FLASH:', 'Tarea eliminada exitosamente', 'success')
@@ -202,7 +202,7 @@ def eliminar(id):
     except DatoInvalidoError as e:
         flash(f'No se puede eliminar: {str(e)}', 'error')
         print('FLASH:', f'No se puede eliminar: {str(e)}', 'error')
-        return redirect(url_for('tareas.detalle', id=id))
+        return redirect(url_for('tareas.detalle', id_tarea=id_tarea))
 
     except Exception as e:
         flash(f'Error al eliminar tarea: {str(e)}', 'error')
@@ -211,16 +211,16 @@ def eliminar(id):
 
 # Cambiar estado
 @tareas_bp.route('/<int:id_tarea>/cambiar-estado', methods=['POST'])
-def cambiar_estado(id):
+def cambiar_estado(id_tarea):
     try:
         nuevo_estado = request.form['estado']
 
         if nuevo_estado == 'completada':
-            tarea_service.completar_tarea(id)
+            tarea_service.completar_tarea(id_tarea)
         elif nuevo_estado == 'bloqueada':
-            tarea_service.bloquear_tarea(id)
+            tarea_service.bloquear_tarea(id_tarea)
         else:
-            tarea_service.actualizar_tarea(id_tarea=id, estado=nuevo_estado)
+            tarea_service.actualizar_tarea(id_tarea=id_tarea, estado=nuevo_estado)
 
         flash(f'Estado actualizado a: {nuevo_estado}', 'success')
         print('FLASH:', f'Estado actualizado a: {nuevo_estado}', 'success')
@@ -238,10 +238,10 @@ def cambiar_estado(id):
 
 # Asignar rapido
 @tareas_bp.route('/<int:id_tarea>/asignar', methods=['POST'])
-def asignar_rapido(id):
+def asignar_rapido(id_tarea):
     try:
         id_miembro = int(request.form['id_miembro'])
-        tarea_service.asignar_tarea(id, id_miembro)
+        tarea_service.asignar_tarea(id_tarea, id_miembro)
 
         miembro = miembro_service.obtener_miembro(id_miembro)
         nombre_miembro = f"{miembro.nombre} {miembro.apellido}" if miembro else str(id_miembro)
