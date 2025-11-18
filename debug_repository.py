@@ -1,6 +1,6 @@
 # debug_repository.py
 from app import create_app
-from app.infrastructure.repositores.proyecto_repositores import ProyectoRepository
+from app.infrastructure.repositories.proyecto_repository import ProyectoRepository
 from app.infrastructure.models.proyecto_model import ProyectoModel
 
 def debug_repository():

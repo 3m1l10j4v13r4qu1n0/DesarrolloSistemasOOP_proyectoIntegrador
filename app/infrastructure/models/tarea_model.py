@@ -67,5 +67,19 @@ class TareaModel(db.Model):
         self.estado = tarea.estado
         self.fecha_vencimiento = date.fromisoformat(tarea.fecha_vencimiento) if tarea.fecha_vencimiento else None
 
+    def to_dict(self):
+        """Convierte el modelo a diccionario para JSON"""
+        return {
+            'id_tarea': self.id_tarea,
+            'titulo': self.titulo,
+            'descripcion': self.descripcion,
+            'id_proyecto': self.id_proyecto,
+            'id_miembro_asignado': self.id_miembro_asignado,
+            'prioridad': self.prioridad,
+            'estado': self.estado,
+            'fecha_creacion': self.fecha_creacion.isoformat() if self.fecha_creacion else None,
+            'fecha_vencimiento': self.fecha_vencimiento.isoformat() if self.fecha_vencimiento else None,
+            'dias_restantes': self.dias_restantes
+        }
 
 

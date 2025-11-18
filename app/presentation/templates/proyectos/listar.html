@@ -54,9 +54,9 @@ Lista todos los proyectos
                     <span class="badge bg-secondary">{{ proyecto.tareas|length }}</span>
                 </td>
                 <td>
-                    <a href="{{ url_for('proyectos.detalle', id=proyecto.id_proyecto) }}" class="btn btn-ver">Ver</a>
-                    <a href="{{ url_for('proyectos.editar', id=proyecto.id_proyecto) }}" class="btn btn-editar">Editar</a>
-                    <form method="POST" action="{{ url_for('proyectos.eliminar', id=proyecto.id_proyecto) }}" style="display: inline;">
+                    <a href="{{ url_for('proyectos.detalle', id_proyecto=proyecto.id_proyecto) }}" class="btn btn-ver">Ver</a>
+                    <a href="{{ url_for('proyectos.editar', id_proyecto=proyecto.id_proyecto) }}" class="btn btn-editar">Editar</a>
+                    <form method="POST" action="{{ url_for('proyectos.eliminar', id_proyecto=proyecto.id_proyecto) }}" style="display: inline;">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este proyecto? Se eliminarán también todas sus tareas.')">Eliminar</button>
                     </form>
                 </td>

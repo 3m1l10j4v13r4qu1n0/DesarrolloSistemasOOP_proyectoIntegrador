@@ -7,7 +7,7 @@ from app.domain.exceptions.proyecto_exceptions import (
     MiembroNoDisponibleError
 )
 from app.application.validators.miembro_validator import MiembroValidator
-from app.infrastructure.repositores.miembro_repositores import MiembroRepository
+from app.infrastructure.repositories.miembro_repository import MiembroRepository
 from app.infrastructure.models.miembro_model import MiembroModel
 
 class MiembroService:
@@ -69,11 +69,10 @@ class MiembroService:
     
     def obtener_miembro(self, id_miembro: int) -> Optional[Miembro]:
         """Obtiene un miembro por ID"""
-        try:
-            miembro_model = self.miembro_repo.obtener_por_id(id_miembro)
-            return miembro_model.to_entity() if miembro_model else None
-        except Exception as e:
+        miembro_model = self.miembro_repo.obtener_por_id(id_miembro)
+        if not miembro_model:
             raise NoEncontradoError("Miembro", id_miembro)
+        return miembro_model.to_entity()
     
     def obtener_miembro_por_email(self, email: str) -> Optional[Miembro]:
         """Obtiene un miembro por email"""

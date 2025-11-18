@@ -1,3 +1,4 @@
+# app/application/services/tarea_service.py
 from typing import List, Optional, Dict
 from datetime import date
 from app.domain.entities.tarea import Tarea
@@ -8,9 +9,9 @@ from app.domain.exceptions.proyecto_exceptions import (
     AsignacionInvalidaError,
     FechaInvalidaError
 )
-from app.infrastructure.repositores.tarea_repositores import TareaRepository
-from app.infrastructure.repositores.proyecto_repositores import ProyectoRepository
-from app.infrastructure.repositores.miembro_repositores import MiembroRepository
+from app.infrastructure.repositories.tarea_repository import TareaRepository
+from app.infrastructure.repositories.proyecto_repository import ProyectoRepository
+from app.infrastructure.repositories.miembro_repository import MiembroRepository
 from app.infrastructure.models.tarea_model import TareaModel
 
 class TareaService:
@@ -21,14 +22,6 @@ class TareaService:
         self.proyecto_repo = ProyectoRepository()
         self.miembro_repo = MiembroRepository()
         self.validator = TareaValidator()
-    
-    def listar_todas(self) -> List[Tarea]:
-        """Lista todas las tareas (alias para compatibilidad con rutas)"""
-        try:
-            tareas_model = self.tarea_repo.obtener_todas()
-            return [tm.to_entity() for tm in tareas_model]
-        except Exception as e:
-            raise DatoInvalidoError(f"Error al listar todas las tareas: {str(e)}")
     
     def crear_tarea(
         self,
@@ -88,11 +81,23 @@ class TareaService:
     
     def obtener_tarea(self, id_tarea: int) -> Optional[Tarea]:
         """Obtiene una tarea por ID"""
-        try:
-            tarea_model = self.tarea_repo.obtener_por_id(id_tarea)
-            return tarea_model.to_entity() if tarea_model else None
-        except Exception as e:
+        tarea_model = self.tarea_repo.obtener_por_id(id_tarea)
+        if not tarea_model:
             raise NoEncontradoError("Tarea", id_tarea)
+        return tarea_model.to_entity()
+    
+    def listar_tareas(self) -> List[Tarea]:
+        """Lista todas las tareas"""
+        try:
+            
+            tareas_model = self.tarea_repo.obtener_todas()
+            
+            return [tm.to_entity() for tm in tareas_model]
+            
+        except DatoInvalidoError:
+            raise
+        except Exception as e:
+            raise DatoInvalidoError(f"Error al listar tareas: {str(e)}")
     
     def listar_tareas_por_proyecto(self, id_proyecto: int) -> List[Tarea]:
         """Lista todas las tareas de un proyecto"""

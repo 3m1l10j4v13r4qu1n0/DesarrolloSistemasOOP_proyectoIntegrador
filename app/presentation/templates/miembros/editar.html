@@ -1,6 +1,6 @@
 <!-- 
 ==================================================
-Formulario para editar miembro
+Formulario para editar miembro - CORREGIDO
 ==================================================
 -->
 {% extends "layout.html" %}
@@ -12,7 +12,7 @@ Formulario para editar miembro
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 style="color: #667eea;">Editar Miembro</h2>
         <div>
-            <a href="{{ url_for('miembros.detalle', id=miembro.id_miembro) }}" class="btn btn-info">
+            <a href="{{ url_for('miembros.detalle', id_miembro=miembro.id_miembro) }}" class="btn btn-info">
                 <i class="bi bi-eye"></i> Ver Detalle
             </a>
             <a href="{{ url_for('miembros.listar') }}" class="btn btn-secondary">
@@ -30,7 +30,7 @@ Formulario para editar miembro
             </h4>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ url_for('miembros.actualizar', id=miembro.id_miembro) }}">
+            <form method="POST" action="{{ url_for('miembros.actualizar', id_miembro=miembro.id_miembro) }}">
                 <div class="row">
                     <!-- Nombre -->
                     <div class="col-md-6 mb-3">
@@ -104,7 +104,7 @@ Formulario para editar miembro
                             id="fecha_ingreso" 
                             name="fecha_ingreso" 
                             required
-                            value="{{ miembro.fecha_ingreso.strftime('%Y-%m-%d') }}">
+                            value="{{ miembro.fecha_ingreso }}">
                     </div>
                 </div>
 
@@ -112,8 +112,6 @@ Formulario para editar miembro
                 <div class="alert alert-info">
                     <strong><i class="bi bi-info-circle"></i> Información:</strong>
                     <ul class="mb-0 mt-2">
-                        <li>Proyectos asignados: <strong>{{ miembro.proyectos|length }}</strong></li>
-                        <li>Tareas asignadas: <strong>{{ miembro.tareas|length }}</strong></li>
                         <li>ID del miembro: <strong>{{ miembro.id_miembro }}</strong></li>
                     </ul>
                 </div>
@@ -122,10 +120,10 @@ Formulario para editar miembro
                     <button type="submit" class="btn btn-warning">
                         <i class="bi bi-save"></i> Actualizar Miembro
                     </button>
-                    <a href="{{ url_for('miembros.detalle', id=miembro.id_miembro) }}" class="btn btn-secondary">
+                    <a href="{{ url_for('miembros.detalle', id_miembro=miembro.id_miembro) }}" class="btn btn-secondary">
                         <i class="bi bi-x-circle"></i> Cancelar
                     </a>
-                    <form method="POST" action="{{ url_for('miembros.eliminar', id=miembro.id_miembro) }}" style="display: inline;" class="float-end">
+                    <form method="POST" action="{{ url_for('miembros.eliminar', id_miembro=miembro.id_miembro) }}" style="display: inline;" class="float-end">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este miembro? Esta acción no se puede deshacer.')">
                             <i class="bi bi-trash"></i> Eliminar Miembro
                         </button>

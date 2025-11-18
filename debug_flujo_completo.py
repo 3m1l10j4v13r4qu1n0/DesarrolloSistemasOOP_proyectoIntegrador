@@ -2,8 +2,8 @@
 from app import create_app
 from app.application.services.tarea_service import TareaService
 from app.application.services.proyecto_service import ProyectoService
-from app.infrastructure.repositores.proyecto_repositores import ProyectoRepository
-from app.infrastructure.repositores.tarea_repositores import TareaRepository
+from app.infrastructure.repositories.proyecto_repository import ProyectoRepository
+from app.infrastructure.repositories.tarea_repository import TareaRepository
 
 def debug_flujo_completo():
     app = create_app()

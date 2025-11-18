@@ -23,7 +23,7 @@ class MiembroRepository:
     def obtener_por_id(self, id_miembro: int) -> Optional[MiembroModel]:
         """Obtiene un miembro por su ID"""
         try:
-            return MiembroModel.query.filter_by(id=id_miembro).first()
+            return MiembroModel.query.filter_by(id_miembro=id_miembro).first()
         except Exception as e:
             raise DatoInvalidoError(f"Error al obtener miembro por ID: {str(e)}")
     

@@ -1,4 +1,3 @@
-
 from datetime import date
 from app.domain.entities.proyecto import Proyecto
 from app.domain.exceptions.proyecto_exceptions import (

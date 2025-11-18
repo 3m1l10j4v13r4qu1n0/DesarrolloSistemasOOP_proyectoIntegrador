@@ -9,8 +9,8 @@ from app.domain.exceptions.proyecto_exceptions import (
     ProyectoInactivoError,
     MiembroNoDisponibleError
 )
-from app.infrastructure.repositores.proyecto_repositores import ProyectoRepository
-from app.infrastructure.repositores.miembro_repositores import MiembroRepository
+from app.infrastructure.repositories.proyecto_repository import ProyectoRepository
+from app.infrastructure.repositories.miembro_repository import MiembroRepository
 from app.infrastructure.models.proyecto_model import ProyectoModel
 
 class ProyectoService:
@@ -58,11 +58,10 @@ class ProyectoService:
     
     def obtener_proyecto(self, id_proyecto: int) -> Optional[Proyecto]:
         """Obtiene un proyecto por ID"""
-        try:
-            proyecto_model = self.proyecto_repo.obtener_por_id(id_proyecto)
-            return proyecto_model.to_entity() if proyecto_model else None
-        except Exception as e:
+        proyecto_model = self.proyecto_repo.obtener_por_id(id_proyecto)
+        if not proyecto_model:
             raise NoEncontradoError("Proyecto", id_proyecto)
+        return proyecto_model.to_entity()
     
     def listar_proyectos(self, estado: str = None) -> List[Proyecto]:
         """Lista todos los proyectos, opcionalmente filtrados por estado"""

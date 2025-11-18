@@ -40,9 +40,9 @@ Lista todos los miembros
                 <td>{{ miembro.fecha_ingreso}}</td>
                 <td>{{ miembro.proyectos|length }}</td>
                 <td>
-                    <a href="{{ url_for('miembros.detalle', id=miembro.id_miembro) }}" class="btn btn-ver">Ver</a>
-                    <a href="{{ url_for('miembros.editar', id=miembro.id_miembro) }}" class="btn btn-editar">Editar</a>
-                    <form method="POST" action="{{ url_for('miembros.eliminar', id=miembro.id_miembro) }}" style="display: inline;">
+                    <a href="{{ url_for('miembros.detalle', id_miembro=miembro.id_miembro) }}" class="btn btn-ver">Ver</a>
+                    <a href="{{ url_for('miembros.editar', id_miembro=miembro.id_miembro) }}" class="btn btn-editar">Editar</a>
+                    <form method="POST" action="{{ url_for('miembros.eliminar', id_miembro=miembro.id_miembro) }}" style="display: inline;">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este miembro?')">Eliminar</button>
                     </form>
                 </td>

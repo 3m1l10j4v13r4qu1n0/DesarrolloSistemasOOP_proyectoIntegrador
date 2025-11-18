@@ -1,5 +1,5 @@
-from typing import Optional
 from datetime import date
+from typing import Optional
 from app.domain.entities.tarea import Tarea
 from app.domain.exceptions.proyecto_exceptions import (
     DatoInvalidoError, 

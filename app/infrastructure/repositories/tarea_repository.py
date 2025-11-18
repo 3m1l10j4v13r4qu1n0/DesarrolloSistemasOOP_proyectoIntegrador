@@ -1,3 +1,4 @@
+# app/infrastructure/repositories/tarea_repository.py
 from typing import List, Optional, Dict
 from datetime import date
 from app import db
@@ -7,6 +8,8 @@ from app.domain.exceptions.proyecto_exceptions import DatoInvalidoError
 class TareaRepository:
     """Repositorio para acceso a datos de Tarea con Flask-SQLAlchemy"""
     
+    def __init__(self):
+        pass
     
     def crear(self, tarea_model: TareaModel) -> TareaModel:
         """Crea una nueva tarea en la BD"""
@@ -18,19 +21,11 @@ class TareaRepository:
         except Exception as e:
             db.session.rollback()
             raise DatoInvalidoError(f"Error al crear tarea: {str(e)}")
-        
-    
-    def obtener_por_proyecto(self, id_proyecto: int) -> List[TareaModel]:
-        """Obtiene todas las tareas de un proyecto - CORREGIDO"""
-        try:
-            return TareaModel.query.filter_by(id_proyecto=id_proyecto).all()
-        except Exception as e:
-            raise DatoInvalidoError(f"Error al obtener tareas del proyecto: {str(e)}")
     
     def obtener_por_id(self, id_tarea: int) -> Optional[TareaModel]:
         """Obtiene una tarea por su ID"""
         try:
-            return TareaModel.query.filter_by(id_tarea=id_tarea).first()
+            return TareaModel.query.filter_by(id_tarea=id_tarea).first()  
         except Exception as e:
             raise DatoInvalidoError(f"Error al obtener tarea por ID: {str(e)}")
     
@@ -41,26 +36,12 @@ class TareaRepository:
         except Exception as e:
             raise DatoInvalidoError(f"Error al obtener todas las tareas: {str(e)}")
     
-    # def obtener_por_id(self, id_tarea: int) -> Optional[TareaModel]:
-    #     """Obtiene una tarea por su ID"""
-    #     try:
-    #         return TareaModel.query.filter_by(id=id_tarea).first()
-    #     except Exception as e:
-    #         raise DatoInvalidoError(f"Error al obtener tarea por ID: {str(e)}")
-    
-    # def obtener_todas(self) -> List[TareaModel]:
-    #     """Obtiene todas las tareas"""
-    #     try:
-    #         return TareaModel.query.all()
-    #     except Exception as e:
-    #         raise DatoInvalidoError(f"Error al obtener todas las tareas: {str(e)}")
-    
-    # def obtener_por_proyecto(self, id_proyecto: int) -> List[TareaModel]:
-    #     """Obtiene todas las tareas de un proyecto"""
-    #     try:
-    #         return TareaModel.query.filter_by(id_proyecto=id_proyecto).all()
-    #     except Exception as e:
-    #         raise DatoInvalidoError(f"Error al obtener tareas del proyecto: {str(e)}")
+    def obtener_por_proyecto(self, id_proyecto: int) -> List[TareaModel]:
+        """Obtiene todas las tareas de un proyecto"""
+        try:
+            return TareaModel.query.filter_by(id_proyecto=id_proyecto).all()
+        except Exception as e:
+            raise DatoInvalidoError(f"Error al obtener tareas del proyecto: {str(e)}")
     
     def obtener_por_miembro(self, id_miembro: int) -> List[TareaModel]:
         """Obtiene todas las tareas asignadas a un miembro"""
